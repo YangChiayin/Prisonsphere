@@ -20,6 +20,7 @@ const inmateSchema = new Schema(
     behaviorReports: [
       { type: mongoose.Schema.Types.ObjectId, ref: "BehaviorReport" },
     ],
+    profileImage: { type: String, default: "" }, //  Cloudinary Image URL
   },
   { timestamps: true }
 );

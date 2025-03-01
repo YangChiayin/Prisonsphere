@@ -17,7 +17,7 @@ const {
  */
 const registerInmate = async (req, res) => {
   try {
-    console.log("DEBUG: Register Inmate Request from User", req.user);
+    // console.log("DEBUG: Register Inmate Request from User", req.user);
 
     // Check if user is authorized to register an inmate
     if (req.user.role !== "warden") {
@@ -28,7 +28,6 @@ const registerInmate = async (req, res) => {
     const {
       firstName,
       lastName,
-      inmateID,
       dateOfBirth,
       gender,
       admissionDate,
@@ -36,28 +35,43 @@ const registerInmate = async (req, res) => {
       assignedCell,
     } = req.body;
 
-    // Ensure the inmate ID is unique
-    const existingInmate = await Inmate.findOne({ inmateID });
-    if (existingInmate) {
-      return res.status(400).json({ message: "Inmate ID already exists" });
+    // Get the last inmate entry to determine the next ID
+    const lastInmate = await Inmate.findOne().sort({ createdAt: -1 });
+
+    let nextInmateID = "INM001"; // Default for the first record
+
+    if (lastInmate && lastInmate.inmateID) {
+      // Extract numeric part and increment
+      const lastIDNumber = parseInt(lastInmate.inmateID.replace("INM", ""), 10);
+      nextInmateID = `INM${String(lastIDNumber + 1).padStart(3, "0")}`;
     }
+
+    // Save image URL from Cloudinary if uploaded
+    const profileImage = req.file ? req.file.path : "";
 
     // Create and save the inmate record
     const inmate = await Inmate.create({
       firstName,
       lastName,
-      inmateID,
+      inmateID: nextInmateID, // Automatically generated ID
       dateOfBirth,
       gender,
       admissionDate,
       crimeDetails,
       assignedCell,
+      profileImage,
     });
 
     // Log activity: Inmate registered
     await logRecentActivity("INMATE_ADDED");
 
-    res.status(201).json({ message: "Inmate registered successfully", inmate });
+    res
+      .status(201)
+      .json({
+        message: "Inmate registered successfully",
+        inmate,
+        nextInmateID,
+      });
   } catch (error) {
     console.error("❌ Error registering inmate:", error);
     res.status(500).json({ message: "Server error", error: error.message });

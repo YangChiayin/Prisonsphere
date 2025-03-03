@@ -17,7 +17,27 @@ const {
  */
 const registerInmate = async (req, res) => {
   try {
-    // console.log("DEBUG: Register Inmate Request from User", req.user);
+    // Validation Check
+    if (!req.body.firstName)
+      return res.status(400).json({ message: "Please enter the first name." });
+    if (!req.body.lastName)
+      return res.status(400).json({ message: "Please enter the last name." });
+    if (!req.body.dateOfBirth)
+      return res
+        .status(400)
+        .json({ message: "Please enter a valid date of birth." });
+    if (!["Male", "Female", "Other"].includes(req.body.gender))
+      return res.status(400).json({ message: "Please select a gender." });
+    if (!req.body.admissionDate)
+      return res
+        .status(400)
+        .json({ message: "Please enter a valid admission date." });
+    if (!req.body.sentenceDuration || isNaN(req.body.sentenceDuration))
+      return res
+        .status(400)
+        .json({ message: "Please enter the sentence duration in months." });
+    if (!req.body.crimeDetails)
+      return res.status(400).json({ message: "Please provide crime details." });
 
     // Check if user is authorized to register an inmate
     if (req.user.role !== "warden") {
@@ -31,20 +51,13 @@ const registerInmate = async (req, res) => {
       dateOfBirth,
       gender,
       admissionDate,
+      sentenceDuration,
       crimeDetails,
       assignedCell,
     } = req.body;
 
-    // Get the last inmate entry to determine the next ID
-    const lastInmate = await Inmate.findOne().sort({ createdAt: -1 });
-
-    let nextInmateID = "INM001"; // Default for the first record
-
-    if (lastInmate && lastInmate.inmateID) {
-      // Extract numeric part and increment
-      const lastIDNumber = parseInt(lastInmate.inmateID.replace("INM", ""), 10);
-      nextInmateID = `INM${String(lastIDNumber + 1).padStart(3, "0")}`;
-    }
+    // Generate the next available Inmate ID
+    const nextInmateID = await generateNextInmateID();
 
     // Save image URL from Cloudinary if uploaded
     const profileImage = req.file ? req.file.path : "";
@@ -53,10 +66,11 @@ const registerInmate = async (req, res) => {
     const inmate = await Inmate.create({
       firstName,
       lastName,
-      inmateID: nextInmateID, // Automatically generated ID
+      inmateID: nextInmateID,
       dateOfBirth,
       gender,
       admissionDate,
+      sentenceDuration,
       crimeDetails,
       assignedCell,
       profileImage,
@@ -65,15 +79,50 @@ const registerInmate = async (req, res) => {
     // Log activity: Inmate registered
     await logRecentActivity("INMATE_ADDED");
 
-    res
-      .status(201)
-      .json({
-        message: "Inmate registered successfully",
-        inmate,
-        nextInmateID,
-      });
+    res.status(201).json({
+      message: "Inmate registered successfully",
+      inmate,
+      nextInmateID,
+      calculatedReleaseDate: inmate.calculatedReleaseDate,
+    });
   } catch (error) {
     console.error("❌ Error registering inmate:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+/**
+ * Get the Next Available Inmate ID
+ * --------------------------------
+ * - Finds the last inmate and determines the next ID in the sequence.
+ *
+ * @route  GET /prisonsphere/inmates/next-id
+ * @access Admin & Warden
+ */
+const generateNextInmateID = async () => {
+  const lastInmate = await Inmate.findOne().sort({ createdAt: -1 });
+
+  let nextInmateID = "INM001";
+  if (lastInmate && lastInmate.inmateID) {
+    const lastIDNumber = parseInt(lastInmate.inmateID.replace("INM", ""), 10);
+    nextInmateID = `INM${String(lastIDNumber + 1).padStart(3, "0")}`;
+  }
+
+  // Ensure unique ID by checking for duplicates before returning
+  const existingInmate = await Inmate.findOne({ inmateID: nextInmateID });
+  if (existingInmate) {
+    return generateNextInmateID(); // Retry generating a unique ID
+  }
+
+  return nextInmateID;
+};
+
+const getNextInmateID = async (req, res) => {
+  try {
+    const nextInmateID = await generateNextInmateID();
+    res.status(200).json({ nextInmateID });
+  } catch (error) {
+    console.error("❌ Error fetching next Inmate ID:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -89,10 +138,70 @@ const registerInmate = async (req, res) => {
  */
 const getAllInmates = async (req, res) => {
   try {
-    const inmates = await Inmate.find();
-    res.status(200).json(inmates);
+    let { page = 1, limit = 5 } = req.query; // Default limit changed to 5
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const totalInmates = await Inmate.countDocuments(); // Total count
+    const inmates = await Inmate.find()
+      .sort({ createdAt: -1 }) // Sort newest inmates first
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    res.status(200).json({
+      inmates,
+      totalInmates,
+      totalPages: Math.ceil(totalInmates / limit),
+      currentPage: page,
+    });
   } catch (error) {
     console.error("❌ Error fetching inmates:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+/**
+ * Search Inmate
+ * ----------------------
+ * - Searches for an inmate by Inmate ID or Full Name.
+ *
+ * @route  GET /prisonsphere/inmates/search?query=value
+ * @access Admin & Warden
+ */
+const searchInmate = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required." });
+    }
+
+    // Search inmates based on ID or Full Name (case-insensitive)
+    const inmates = await Inmate.find({
+      $or: [
+        { inmateID: { $regex: query, $options: "i" } },
+        { firstName: { $regex: query, $options: "i" } },
+        { lastName: { $regex: query, $options: "i" } },
+        {
+          $expr: {
+            $regexMatch: {
+              input: { $concat: ["$firstName", " ", "$lastName"] },
+              regex: query,
+              options: "i",
+            },
+          },
+        },
+      ],
+    }).lean();
+
+    if (!inmates.length) {
+      return res.status(404).json({ message: "No inmates found." });
+    }
+
+    res.status(200).json(inmates);
+  } catch (error) {
+    console.error("❌ Error searching inmate:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -138,6 +247,30 @@ const getInmateById = async (req, res) => {
 const updateInmate = async (req, res) => {
   try {
     const { status } = req.body; // Extract status if provided
+    const behaviorReports = req.body.behaviorReports || [];
+    let updatedData = { ...req.body };
+
+    // Ensure correct date formatting
+    if (req.body.dateOfBirth) {
+      updatedData.dateOfBirth = new Date(req.body.dateOfBirth);
+    }
+    if (req.body.admissionDate) {
+      updatedData.admissionDate = new Date(req.body.admissionDate);
+    }
+
+    // Handle profile image update
+    if (req.file) {
+      updatedData.profileImage = req.file.path;
+    }
+
+    // behaviorReports` Issue**
+    if (behaviorReports && Array.isArray(behaviorReports)) {
+      updatedData.behaviorReports = behaviorReports.filter(
+        (report) => report && report.length === 24 // Only include valid ObjectIds
+      );
+    } else {
+      updatedData.behaviorReports = [];
+    }
 
     // Validate the status update (if present)
     if (status && !["Incarcerated", "Released", "Parole"].includes(status)) {
@@ -155,7 +288,6 @@ const updateInmate = async (req, res) => {
         });
       }
 
-      // Prevent parole status update if the last request was denied
       if (existingParole.status === "Denied") {
         return res.status(400).json({
           message:
@@ -163,7 +295,6 @@ const updateInmate = async (req, res) => {
         });
       }
 
-      // If parole was already approved, prevent redundant update
       if (existingParole.status === "Approved") {
         return res.status(200).json({
           message: "Inmate is already on parole. No changes made.",
@@ -172,7 +303,7 @@ const updateInmate = async (req, res) => {
     }
 
     // Update inmate details
-    const inmate = await Inmate.findByIdAndUpdate(req.params.id, req.body, {
+    const inmate = await Inmate.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,
     });
 
@@ -202,17 +333,19 @@ const updateInmate = async (req, res) => {
  */
 const deleteInmate = async (req, res) => {
   try {
-    const inmate = await Inmate.findByIdAndDelete(req.params.id);
+    const inmate = await Inmate.findById(req.params.id);
     if (!inmate) {
       return res.status(404).json({ message: "Inmate not found" });
     }
 
-    // Log activity: Inmate deleted
-    await logRecentActivity("INMATE_DELETED");
+    inmate.status = "Released"; // Change status instead of deleting for soft delete
+    await inmate.save();
 
-    res.status(200).json({ message: "Inmate deleted successfully" });
+    await logRecentActivity("INMATE_RELEASED");
+
+    res.status(200).json({ message: "Inmate marked as released", inmate });
   } catch (error) {
-    console.error("❌ Error deleting inmate:", error);
+    console.error("❌ Error updating inmate status:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -220,7 +353,9 @@ const deleteInmate = async (req, res) => {
 // Export controller functions for use in routes
 module.exports = {
   registerInmate,
+  getNextInmateID,
   getAllInmates,
+  searchInmate,
   getInmateById,
   updateInmate,
   deleteInmate,

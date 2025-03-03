@@ -5,7 +5,8 @@ import { MdOutlineAccountBalance } from "react-icons/md"; // Inmate Mgmt
 import { AiOutlineUsergroupAdd } from "react-icons/ai"; // Visitor Logs
 import { FaGavel, FaRegHandshake } from "react-icons/fa"; // Parole & Rehab
 import { FiFileText } from "react-icons/fi"; // Reports
-import pageImg from "../assets/images/landingPageImg.png";
+import pageImg1 from "../assets/images/landingPgImg1.png";
+import pageImg2 from "../assets/images/landingPgImg2.png";
 import Navbar from "../components/Navbar";
 
 const LandingPage = () => {
@@ -40,7 +41,7 @@ const LandingPage = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-lg bg-blue-600 px-6 py-2.5 text-center text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
+                  className="rounded-lg bg-blue-600 px-10 py-3 text-center text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
                 >
                   Login
                 </motion.button>
@@ -86,7 +87,11 @@ const LandingPage = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full md:w-1/2 flex justify-center mt-10 md:mt-0 hidden md:flex"
           >
-            <img src={pageImg} alt="PrisonSphere Overview" className="" />
+            <img
+              src={pageImg1}
+              alt="PrisonSphere Overview"
+              className="object-contain w-full h-auto md:w-[550px] md:h-[550px]"
+            />
           </motion.div>
         </div>
       </div>

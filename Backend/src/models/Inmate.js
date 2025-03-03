@@ -9,7 +9,7 @@ const inmateSchema = new Schema(
     dateOfBirth: { type: Date, required: true },
     gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
     admissionDate: { type: Date, required: true },
-    releaseDate: { type: Date },
+    sentenceDuration: { type: Number, required: true }, // Sentence duration in months
     crimeDetails: { type: String, required: true },
     status: {
       type: String,
@@ -20,9 +20,19 @@ const inmateSchema = new Schema(
     behaviorReports: [
       { type: mongoose.Schema.Types.ObjectId, ref: "BehaviorReport" },
     ],
-    profileImage: { type: String, default: "" }, //  Cloudinary Image URL
+    profileImage: { type: String, default: "" }, // Cloudinary Image URL
   },
   { timestamps: true }
 );
+
+// Virtual field to calculate release date dynamically
+inmateSchema.virtual("calculatedReleaseDate").get(function () {
+  if (this.sentenceDuration && this.admissionDate) {
+    let releaseDate = new Date(this.admissionDate);
+    releaseDate.setMonth(releaseDate.getMonth() + this.sentenceDuration);
+    return releaseDate;
+  }
+  return null;
+});
 
 module.exports = mongoose.model("Inmate", inmateSchema);

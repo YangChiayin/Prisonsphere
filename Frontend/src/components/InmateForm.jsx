@@ -32,7 +32,7 @@ const inmateSchema = yup.object().shape({
     .required("⚠ Sentence Duration (months) is required."),
   crimeDetails: yup.string().required("⚠ Crime Details are required."),
   assignedCell: yup.string().required("⚠ Assigned Cell is required."),
-  status: yup.string().oneOf(["Incarcerated", "Released", "Parole"]),
+  status: yup.string().oneOf(["Incarcerated", "Released"]),
   profileImage: yup.mixed().nullable(),
 });
 
@@ -50,7 +50,6 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
   });
 
   const [selectedImage, setSelectedImage] = useState(null);
-  const [paroleRequestExists, setParoleRequestExists] = useState(false);
 
   // Load inmate data for editing
   useEffect(() => {
@@ -68,21 +67,6 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
           setValue(key, inmateData[key]);
         }
       });
-
-      // Check if parole request exists for Parole status
-      if (inmateData.status === "Parole") {
-        axios
-          .get(
-            `http://localhost:5000/prisonsphere/paroles?inmate=${inmateData._id}`
-          )
-          .then((res) => {
-            const approvedParole = res.data.find(
-              (p) => p.status === "Approved"
-            );
-            setParoleRequestExists(!!approvedParole);
-          })
-          .catch(() => setParoleRequestExists(false));
-      }
 
       if (inmateData.profileImage) {
         setSelectedImage(inmateData.profileImage);
@@ -127,16 +111,6 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
       let response;
 
       if (isEditMode) {
-        // Prevent Parole Status Update without an Approved Request
-        if (data.status === "Parole" && !paroleRequestExists) {
-          toast.error("⚠ Parole cannot be set without an approved request.", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-          });
-          return;
-        }
-
         response = await axios.put(
           `http://localhost:5000/prisonsphere/inmates/${inmateData._id}`,
           formData,
@@ -172,7 +146,7 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
             hideProgressBar: false,
             onClose: () => {
               onClose();
-              onFormSuccess(); //  Refresh the UI immediately
+              onFormSuccess(); //Refresh the UI immediately
             },
           }
         );
@@ -314,7 +288,6 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
                 className="w-full p-3 border rounded-lg"
               >
                 <option value="Incarcerated">Incarcerated</option>
-                <option value="Parole">Parole</option>
                 <option value="Released">Released</option>
               </select>
             </div>

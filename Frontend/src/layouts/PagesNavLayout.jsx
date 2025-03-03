@@ -22,6 +22,10 @@ const PagesNavLayout = ({ children }) => {
       title: "Inmate Management",
       description: `Welcome back ${userRole}`,
     },
+    "/inmates/view/:id": {
+      title: "Inmate Details",
+      description: "Viewing inmate profile",
+    },
     "/visitors": {
       title: "Visitor Management",
       description: `Welcome back, ${userRole}`,

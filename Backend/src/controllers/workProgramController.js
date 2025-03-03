@@ -96,5 +96,27 @@ const getEnrollments = async (req, res) => {
   }
 };
 
+// @desc   Get Work Program Enrollments for a Specific Inmate
+// @route  GET /prisonsphere/work-programs/enrollments/inmate/:inmateId
+// @access Admin & Warden
+const getEnrollmentsByInmate = async (req, res) => {
+  try {
+    const { inmateId } = req.params;
+    const enrollments = await WorkProgramEnrollment.find({
+      inmate: inmateId,
+    }).populate("workProgram", "name startDate expectedCompletionDate");
+
+    res.status(200).json(enrollments);
+  } catch (error) {
+    console.error("❌ Error fetching rehabilitation enrollments:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // Export controller functions for use in routes
-module.exports = { getWorkPrograms, enrollInWorkProgram, getEnrollments };
+module.exports = {
+  getWorkPrograms,
+  enrollInWorkProgram,
+  getEnrollments,
+  getEnrollmentsByInmate,
+};

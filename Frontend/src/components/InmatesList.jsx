@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import ProfileImgPlacehoder from "../assets/images/ProfilePlaceholder.png";
 
 const InmateList = ({
@@ -12,6 +13,8 @@ const InmateList = ({
   searchQuery,
   onEdit,
 }) => {
+  const navigate = useNavigate(); // Initialize navigation
+
   // Calculate the start and end record numbers dynamically
   const startRecord = totalInmates > 0 ? (page - 1) * limit + 1 : 0;
   const endRecord = totalInmates > 0 ? Math.min(page * limit, totalInmates) : 0;
@@ -86,9 +89,17 @@ const InmateList = ({
                         </span>
                       </td>
                       <td className="p-3 flex space-x-2">
-                        <button className="px-2 py-1 text-gray-600 border rounded-md text-sm hover:bg-gray-100 transition">
+                        {/*"View" Button */}
+                        <button
+                          onClick={() =>
+                            navigate(`/inmates/view/${inmate._id}`)
+                          }
+                          className="px-2 py-1 text-gray-600 border rounded-md text-sm hover:bg-gray-100 transition"
+                        >
                           View
                         </button>
+
+                        {/*"Edit" Button */}
                         <button
                           onClick={() => onEdit(inmate)}
                           className="px-2 py-1 text-blue-600 border rounded-md text-sm hover:bg-blue-50 transition"

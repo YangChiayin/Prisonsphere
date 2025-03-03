@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Inmate = require("../models/Inmate");
-const Parole = require("../models/Parole");
 const {
   logRecentActivity,
 } = require("../controllers/recentActivityLogController"); // Import logging function
@@ -238,7 +237,6 @@ const getInmateById = async (req, res) => {
  * Update Inmate Details (Including Status)
  * ----------------------------------------
  * - Updates an inmate's details.
- * - Ensures valid status updates (e.g., "Parole" requires an approved parole request).
  * - Logs the activity as "INMATE_UPDATED".
  *
  * @route  PUT /prisonsphere/inmates/:id
@@ -273,33 +271,8 @@ const updateInmate = async (req, res) => {
     }
 
     // Validate the status update (if present)
-    if (status && !["Incarcerated", "Released", "Parole"].includes(status)) {
+    if (status && !["Incarcerated", "Released"].includes(status)) {
       return res.status(400).json({ message: "Invalid status provided" });
-    }
-
-    // If setting status to "Parole", ensure a parole request exists
-    if (status === "Parole") {
-      const existingParole = await Parole.findOne({ inmate: req.params.id });
-
-      if (!existingParole) {
-        return res.status(400).json({
-          message:
-            "No parole request found. A parole request must be submitted first.",
-        });
-      }
-
-      if (existingParole.status === "Denied") {
-        return res.status(400).json({
-          message:
-            "Previous parole request was denied. A new request must be submitted first.",
-        });
-      }
-
-      if (existingParole.status === "Approved") {
-        return res.status(200).json({
-          message: "Inmate is already on parole. No changes made.",
-        });
-      }
     }
 
     // Update inmate details

@@ -46,6 +46,24 @@ const getAllParoleApplications = async (req, res) => {
   }
 };
 
+// @desc   Get Parole History for a Specific Inmate
+// @route  GET /prisonsphere/paroles/inmate/:inmateId
+// @access Admin & Warden
+const getParoleHistoryByInmate = async (req, res) => {
+  try {
+    const { inmateId } = req.params;
+    const paroles = await Parole.find({ inmate: inmateId }).populate(
+      "inmate",
+      "firstName lastName inmateID"
+    );
+
+    res.status(200).json(paroles);
+  } catch (error) {
+    console.error("❌ Error fetching parole history:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // @desc   Update Parole Status (Approve/Deny)
 // @route  PUT /prisonsphere/paroles/:id
 // @access Warden Only
@@ -120,6 +138,7 @@ const filterParolesByDate = async (req, res) => {
 module.exports = {
   submitParoleApplication,
   getAllParoleApplications,
+  getParoleHistoryByInmate,
   updateParoleStatus,
   filterParolesByDate,
 };

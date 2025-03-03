@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import InmateManagement from "./pages/InmateManagement";
+import ViewInmate from "./pages/ViewInmate";
 import VisitorManagement from "./pages/VisitorManagement";
 import ParoleManagement from "./pages/ParoleManagement";
 import RehabilitaionAndWork from "./pages/RehabilitaionAndWork";
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/inmates" element={<InmateManagement />} />
+        <Route path="/inmates/view/:id" element={<ViewInmate />} />
         <Route path="/visitors" element={<VisitorManagement />} />
         <Route path="/parole" element={<ParoleManagement />} />
         <Route path="/rehabilitation" element={<RehabilitaionAndWork />} />

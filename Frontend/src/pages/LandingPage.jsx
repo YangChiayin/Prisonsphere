@@ -1,3 +1,24 @@
+/**
+ * @file LandingPage.js
+ * @description Landing page for the PrisonSphere system.
+ * @module pages/LandingPage
+ *
+ * This component:
+ * - Provides an introduction to PrisonSphere.
+ * - Highlights key system features and modules.
+ * - Includes a call-to-action (CTA) for login.
+ *
+ * Features:
+ * - Uses `Framer Motion` for smooth animations.
+ * - Implements a responsive layout optimized for different screen sizes.
+ * - Displays core system modules with icons.
+ *
+ * @requires react - React library for UI rendering.
+ * @requires react-router-dom - Library for navigation.
+ * @requires framer-motion - Animation library for UI transitions.
+ * @requires react-icons - Provides icons for better UX.
+ */
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,9 +27,18 @@ import { AiOutlineUsergroupAdd } from "react-icons/ai"; // Visitor Logs
 import { FaGavel, FaRegHandshake } from "react-icons/fa"; // Parole & Rehab
 import { FiFileText } from "react-icons/fi"; // Reports
 import pageImg1 from "../assets/images/landingPgImg1.png";
-import pageImg2 from "../assets/images/landingPgImg2.png";
 import Navbar from "../components/Navbar";
 
+/**
+ * LandingPage Component
+ * ---------------------
+ * - Displays an overview of PrisonSphere.
+ * - Includes a call-to-action (CTA) for login.
+ * - Showcases system modules with icons.
+ *
+ * @component
+ * @returns {JSX.Element} - The Landing Page UI component.
+ */
 const LandingPage = () => {
   return (
     <>

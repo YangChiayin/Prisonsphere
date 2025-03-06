@@ -1,3 +1,25 @@
+/**
+ * @file LoginPage.js
+ * @description Login page for Warden/Admin authentication in the PrisonSphere system.
+ * @module pages/LoginPage
+ *
+ * This component:
+ * - Provides a login interface for Warden/Admin users.
+ * - Handles user authentication using `loginUser` API.
+ * - Stores authentication tokens and roles in local storage upon successful login.
+ *
+ * Features:
+ * - Uses controlled form inputs with React state.
+ * - Implements password visibility toggle.
+ * - Displays error messages when authentication fails.
+ * - Redirects users to the dashboard upon successful login.
+ *
+ * @requires react - React library for UI rendering.
+ * @requires react-router-dom - Library for navigation.
+ * @requires framer-motion - Animation library for UI transitions.
+ * @requires react-icons - Provides icons for better UX.
+ * @requires authService - Handles authentication API requests.
+ */
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import logo from "../assets/images/logoBlue.png";
@@ -6,6 +28,15 @@ import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+/**
+ * LoginPage Component
+ * -------------------
+ * - Provides login functionality for PrisonSphere Warden/Admin users.
+ * - Handles user authentication and redirection upon successful login.
+ *
+ * @component
+ * @returns {JSX.Element} - The Login Page UI component.
+ */
 const LoginPage = () => {
   //declartion of form data variables
   const [username, setUsername] = useState(""); // State for username
@@ -14,7 +45,16 @@ const LoginPage = () => {
   const [error, setError] = useState(""); // State for error rendering
   const navigate = useNavigate(); //redirect after login
 
-  //function to handle form submission character
+  /**
+   * Handles form submission for user login.
+   * - Prevents default form submission.
+   * - Calls `loginUser` API to authenticate the user.
+   * - Stores authentication tokens and user roles in local storage.
+   * - Redirects the user to the dashboard upon successful login.
+   * - Displays an error message if authentication fails.
+   *
+   * @param {Object} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault(); //prevent default form submission
     setError(""); //reset error on every submission

@@ -1,3 +1,17 @@
+/**
+ * @file recentActivityLogController.js
+ * @description Handles logging and retrieval of recent activities within the PrisonSphere system.
+ * @module controllers/recentActivityLogController
+ *
+ * This module:
+ * - Logs user activities to track changes within the system.
+ * - Prevents duplicate logs by updating count instead of creating new entries.
+ * - Retrieves recent activity logs with human-readable timestamps.
+ *
+ * @requires mongoose - MongoDB ODM library.
+ * @requires RecentActivityLog - Recent Activity Log model schema.
+ */
+
 const RecentActivityLog = require("../models/RecentActivityLog");
 
 /**
@@ -6,6 +20,8 @@ const RecentActivityLog = require("../models/RecentActivityLog");
  * - If a similar activity exists within 1 hour, update its count.
  * - Otherwise, create a new log entry.
  * - Ensures logs are not duplicated within a short time window.
+ *
+ * @param {String} activityType - The type of activity to be logged.
  */
 const logRecentActivity = async (activityType) => {
   try {
@@ -36,7 +52,7 @@ const logRecentActivity = async (activityType) => {
       });
     }
   } catch (error) {
-    console.error("❌ Error logging recent activity:", error);
+    console.error("Error logging recent activity:", error);
   }
 };
 
@@ -46,6 +62,13 @@ const logRecentActivity = async (activityType) => {
  * - Fetches activities recorded within the last 24 hours.
  * - Groups logs together and provides human-readable time labels.
  * - Returns formatted data for the frontend.
+ *
+ * @route  GET /prisonsphere/dashboard/recent-activities
+ * @access Admin & Warden
+ *
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Array} - List of recent activities formatted with time labels.
  */
 const getRecentActivities = async (req, res) => {
   try {
@@ -96,6 +119,10 @@ const getRecentActivities = async (req, res) => {
  * ------------------------------------------
  * - Generates human-readable messages based on activity type and count.
  * - Uses pluralization to ensure correct wording.
+ *
+ * @param {String} activityType - The type of activity.
+ * @param {Number} count - Number of times the activity has occurred.
+ * @returns {String} - A formatted message describing the activity.
  */
 const generateActivityMessage = (activityType, count) => {
   // Function to pluralize words based on count (e.g., "1 inmate" vs. "2 inmates")

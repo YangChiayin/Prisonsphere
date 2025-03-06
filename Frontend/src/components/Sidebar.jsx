@@ -1,3 +1,23 @@
+/**
+ * @file Sidebar.js
+ * @description Sidebar navigation menu for the PrisonSphere system.
+ * @module components/Sidebar
+ *
+ * This component:
+ * - Provides a fixed navigation menu for managing different system modules.
+ * - Includes links to Dashboard, Inmate Management, Visitors, Parole, Reports, etc.
+ * - Features a logout button that securely logs the user out.
+ *
+ * Features:
+ * - Uses `react-router-dom` for navigation with active link highlighting.
+ * - Implements a reusable `SidebarItem` component for better scalability.
+ * - Uses authentication service for secure logout handling.
+ *
+ * @requires react - React library for UI rendering.
+ * @requires react-router-dom - Library for managing navigation.
+ * @requires react-icons - Provides icons for better UX.
+ * @requires authService - Handles logout functionality.
+ */
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaChartLine, FaGavel, FaRegHandshake } from "react-icons/fa";
@@ -7,9 +27,23 @@ import { FiFileText, FiLogOut } from "react-icons/fi";
 import { logoutUser } from "../services/authService";
 import logo from "../assets/images/logoBlue.png";
 
+/**
+ * Sidebar Component
+ * -----------------
+ * - Provides a navigation menu for accessing system modules.
+ * - Includes an interactive logout button.
+ *
+ * @component
+ * @returns {JSX.Element} - The sidebar navigation UI component.
+ */
 const Sidebar = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Navigation hook for redirecting users
 
+  /**
+   * Handles user logout.
+   * - Calls the authentication service to log the user out.
+   * - Redirects the user to the login page upon success.
+   */
   const handleLogout = async () => {
     try {
       const success = await logoutUser();
@@ -55,7 +89,7 @@ const Sidebar = () => {
             text="Visitor Management"
           />
           <SidebarItem
-            to="/parole"
+            to="/paroles"
             icon={<FaGavel />}
             text="Parole Management"
           />
@@ -82,7 +116,18 @@ const Sidebar = () => {
   );
 };
 
-/** Reusable Sidebar Link Component */
+/**
+ * Reusable SidebarItem Component
+ * ------------------------------
+ * - Creates a navigational link with an icon and text.
+ * - Highlights active links using `react-router-dom`'s `isActive` property.
+ *
+ * @component
+ * @param {String} to - The path of the navigation link.
+ * @param {JSX.Element} icon - The icon representing the link.
+ * @param {String} text - The label text for the link.
+ * @returns {JSX.Element} - The sidebar link component.
+ */
 const SidebarItem = ({ to, icon, text }) => {
   return (
     <li>

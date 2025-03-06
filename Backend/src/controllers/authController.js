@@ -1,30 +1,41 @@
 /**
- * Authentication Controller
- * --------------------------
- * This module handles user authentication within the PrisonSphere system,
- * including login, logout, and JWT token generation.
+ * @file authController.js
+ * @description Handles user authentication within the PrisonSphere system.
+ * @module controllers/authController
  *
- * Controller Functions:
- * - login_get → Renders the login page (Placeholder for frontend integration).
- * - login_post → Handles user authentication, verifies credentials, and generates JWT.
- * - logout_get → Clears JWT token by resetting the cookie.
+ * This module:
+ * - Manages user login, logout, and session verification.
+ * - Uses bcrypt.js for password hashing and verification.
+ * - Implements JWT authentication with HTTP-only cookies.
  *
  * Authentication Features:
- * - Uses **bcrypt.js** to securely compare hashed passwords.
- * - Generates **JWT tokens** with a 3-day expiration (maxAge set to 3 days).
- * - Stores JWT in an **HTTP-only cookie** for security.
+ * - **Secure Password Handling**: Uses bcrypt to compare hashed passwords.
+ * - **JWT Tokens**: Generates authentication tokens valid for 1 hour.
+ * - **HTTP-only Cookies**: Stores JWT tokens securely to prevent client-side access.
  *
  * Security:
- * - Ensures only valid users can obtain a token.
- * - Passwords are never returned in responses.
- *
+ * - Prevents unauthorized access by verifying user credentials.
+ * - Ensures passwords are never exposed in responses.
+ * - Uses HTTP-only, secure, and SameSite cookies to mitigate CSRF attacks.
  */
 
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// POST - Login User
+/**
+ * Login User
+ * ----------
+ * - Authenticates a user and issues a JWT token.
+ * - Verifies credentials against the database.
+ * - Stores the JWT in an HTTP-only cookie.
+ *
+ * @route  POST /prisonsphere/auth/login
+ * @access Public
+ *
+ * @param {Object} req - Express request object containing username and password.
+ * @param {Object} res - Express response object.
+ */
 const login_post = async (req, res) => {
   const { username, password } = req.body;
 
@@ -57,7 +68,18 @@ const login_post = async (req, res) => {
   }
 };
 
-// GET - Verify Login Status
+/**
+ * Verify Login Status
+ * -------------------
+ * - Checks if a user is logged in by verifying the stored JWT token.
+ *
+ * @route  GET /prisonsphere/auth/status
+ * @access Private
+ *
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
+
 const login_get = async (req, res) => {
   try {
     const token = req.cookies.token;
@@ -70,9 +92,19 @@ const login_get = async (req, res) => {
   }
 };
 
-// GET - Logout User
+/**
+ * Logout User
+ * -----------
+ * - Logs out a user by clearing the JWT cookie.
+ *
+ * @route  GET /prisonsphere/auth/logout
+ * @access Private
+ *
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
 const logout = async (req, res) => {
-  res.cookie("token", "", { expires: new Date(0) });
+  res.cookie("token", "", { expires: new Date(0) }); // Expire the JWT token
   res.json({ message: "Logged out successfully" });
 };
 

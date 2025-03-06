@@ -1,3 +1,27 @@
+/**
+ * @file seedWorkPrograms.js
+ * @description Seeds initial work programs into the database for the PrisonSphere system.
+ * @module utils/seedWorkPrograms
+ *
+ * This script:
+ * - Connects to MongoDB and inserts predefined work programs.
+ * - Deletes existing records before inserting new ones to avoid duplicates.
+ * - Provides structured work opportunities for inmates.
+ *
+ * Usage:
+ * - Run this script manually to populate the database with default work programs.
+ * - Command: `node seedWorkPrograms.js`
+ *
+ * Security Considerations:
+ * - Uses environment variables to securely connect to the database.
+ * - Prevents redundant seeding by clearing existing records before inserting.
+ *
+ * @requires mongoose - MongoDB ODM library.
+ * @requires dotenv - Loads environment variables.
+ * @requires connectDB - Establishes a database connection.
+ * @requires WorkProgram - The Work Program model for storing job details.
+ */
+
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const connectDB = require("./src/config/db");
@@ -6,6 +30,12 @@ const WorkProgram = require("./src/models/WorkProgram");
 dotenv.config();
 connectDB();
 
+/**
+ * Seed Work Programs
+ * ------------------
+ * - Deletes existing work programs to avoid duplicates.
+ * - Inserts predefined work programs into the database.
+ */
 const seedWorkPrograms = async () => {
   const workPrograms = [
     {
@@ -37,12 +67,12 @@ const seedWorkPrograms = async () => {
   ];
 
   try {
-    await WorkProgram.deleteMany();
-    await WorkProgram.insertMany(workPrograms);
-    console.log("✅ Work Programs Seeded Successfully!");
+    await WorkProgram.deleteMany(); // **Clear existing records before seeding**
+    await WorkProgram.insertMany(workPrograms); // **Insert new work programs**
+    console.log("Work Programs Seeded Successfully!");
     process.exit();
   } catch (error) {
-    console.error("❌ Seeding Failed:", error);
+    console.error("Seeding Failed:", error);
     process.exit(1);
   }
 };

@@ -1,3 +1,20 @@
+/**
+ * @file InmateForm.js
+ * @description React component for registering and updating inmate records.
+ * @module components/InmateForm
+ *
+ * This form allows users to:
+ * - Register a new inmate.
+ * - Update an existing inmate's details.
+ * - Upload a profile image for the inmate.
+ *
+ * @requires react - React library for component-based UI.
+ * @requires react-hook-form - Hook-based form handling.
+ * @requires yup - Schema validation library.
+ * @requires axios - HTTP client for API requests.
+ * @requires framer-motion - Animation library for smooth transitions.
+ * @requires react-toastify - Notification library for user feedback.
+ */
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,7 +25,8 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 
-// Validation Schema
+// **Validation Schema**
+// Defines validation rules for each input field
 const inmateSchema = yup.object().shape({
   firstName: yup.string().required("⚠ First Name is required."),
   lastName: yup.string().required("⚠ Last Name is required."),
@@ -36,9 +54,20 @@ const inmateSchema = yup.object().shape({
   profileImage: yup.mixed().nullable(),
 });
 
+/**
+ * @component InmateForm
+ * @description Form for adding or editing an inmate.
+ *
+ * @param {Object} props - Component properties.
+ * @param {string} props.nextInmateID - The next available inmate ID for registration.
+ * @param {Function} props.onClose - Callback function to close the form.
+ * @param {Object} [props.inmateData] - Inmate data for editing mode (optional).
+ * @param {Function} props.onFormSuccess - Callback function to refresh the UI upon successful submission.
+ */
 const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
-  const isEditMode = !!inmateData; // Detect if editing
+  const isEditMode = !!inmateData; // Detect if the form is in edit mode
 
+  // React Hook Form setup
   const {
     register,
     handleSubmit,
@@ -51,7 +80,10 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Load inmate data for editing
+  /**
+   * Load inmate data into the form if in edit mode.
+   * Converts date fields to `YYYY-MM-DD` format for proper display.
+   */
   useEffect(() => {
     if (isEditMode && inmateData) {
       Object.keys(inmateData).forEach((key) => {
@@ -74,7 +106,10 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
     }
   }, [isEditMode, inmateData, setValue]);
 
-  // Handle Image Selection
+  /**
+   * Handles profile image selection and previews it.
+   * @param {Event} event - File input change event.
+   */
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -83,7 +118,12 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
     }
   };
 
-  // Form Submission
+  /**
+   * Submits the form data to the server.
+   * Handles both new inmate registration and inmate updates.
+   *
+   * @param {Object} data - Form data collected from user input.
+   */
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -317,31 +357,70 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
             </p>
           </div>
 
-          {/*Profile Image Upload */}
-          <div>
-            <label className="block">Profile Image</label>
+          {/* Profile Image Upload */}
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-2">
+              Photo Upload
+            </label>
+            <div
+              className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100"
+              onClick={() => document.getElementById("profileUpload").click()}
+            >
+              {selectedImage ? (
+                <img
+                  src={selectedImage}
+                  alt="Profile Preview"
+                  className="w-full h-40 object-cover rounded-lg"
+                />
+              ) : (
+                <div className="flex flex-col items-center text-gray-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-10 w-10 mb-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M7 16v4m10-4v4M4 12l8-8 8 8M12 4v12"
+                    />
+                  </svg>
+                  <p className="text-sm font-medium">
+                    <span className="text-blue-600">Click to upload</span> or
+                    drag and drop
+                  </p>
+                  <p className="text-xs">PNG, JPG or JPEG (MAX. 2MB)</p>
+                </div>
+              )}
+            </div>
             <input
               type="file"
+              id="profileUpload"
               accept="image/*"
               onChange={handleImageChange}
-              className="w-full p-3 border rounded-lg"
+              className="hidden"
             />
-            {selectedImage && (
-              <img
-                src={selectedImage}
-                alt="Profile Preview"
-                className="mt-2 w-24 h-24 object-cover rounded-lg border"
-              />
-            )}
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            {isEditMode ? "Update Inmate" : "Register Inmate"}
-          </button>
+          {/* Cancel & Submit Buttons */}
+          <div className="flex justify-end space-x-4 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              {isEditMode ? "Update Inmate" : "Register Inmate"}
+            </button>
+          </div>
         </form>
       </div>
     </motion.div>

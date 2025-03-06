@@ -1,3 +1,26 @@
+/**
+ * @file ViewInmate.js
+ * @description Detailed view page for an inmate, displaying personal information, visitor logs, parole history, and rehabilitation status.
+ * @module pages/ViewInmate
+ *
+ * This component:
+ * - Fetches and displays detailed inmate information.
+ * - Allows users to view visitation history, parole history, and work programs.
+ * - Supports editing inmate details via a modal form.
+ *
+ * Features:
+ * - Uses `useParams` to dynamically retrieve inmate data based on ID.
+ * - Fetches additional data related to visitation, parole, and work programs.
+ * - Implements tab navigation to switch between inmate-related data.
+ * - Supports editing inmate details through a modal form.
+ *
+ * @requires react - React library for UI rendering.
+ * @requires react-router-dom - Library for managing dynamic routes.
+ * @requires axios - Library for making HTTP requests.
+ * @requires react-icons - Provides icons for better UI experience.
+ * @requires PagesNavLayout - Layout wrapper including sidebar and top navbar.
+ * @requires InmateForm - Component for editing inmate details.
+ */
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,18 +30,30 @@ import ProfilePlaceholder from "../assets/images/ProfilePlaceholder.png";
 import PagesNavLayout from "../layouts/PagesNavLayout";
 import InmateForm from "../components/InmateForm";
 
+/**
+ * ViewInmate Component
+ * --------------------
+ * - Displays an inmate's profile with visitation and parole history.
+ * - Allows users to edit inmate details.
+ *
+ * @component
+ * @returns {JSX.Element} - The inmate details page UI component.
+ */
 const ViewInmate = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [inmate, setInmate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [visitors, setVisitors] = useState([]);
-  const [paroleHistory, setParoleHistory] = useState([]);
-  const [workPrograms, setWorkPrograms] = useState([]);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [activeTab, setActiveTab] = useState("visitation");
+  const { id } = useParams(); // **Extracts inmate ID from URL params**
+  const navigate = useNavigate(); // **Handles navigation within the app**
+  const [inmate, setInmate] = useState(null); // **Stores inmate details**
+  const [loading, setLoading] = useState(true); // **Indicates loading state**
+  const [error, setError] = useState(""); // **Stores error messages**
+  const [visitors, setVisitors] = useState([]); // **Stores visitor history**
+  const [paroleHistory, setParoleHistory] = useState([]); // **Stores parole records**
+  const [workPrograms, setWorkPrograms] = useState([]); // **Stores work programs data**
+  const [showEditForm, setShowEditForm] = useState(false); // **Toggles edit modal visibility**
+  const [activeTab, setActiveTab] = useState("visitation"); // **Manages active tab state**
 
+  /**
+   * Fetches inmate details from the backend.
+   */
   const fetchInmateDetails = async () => {
     try {
       setLoading(true);
@@ -39,6 +74,9 @@ const ViewInmate = () => {
     }
   };
 
+  /**
+   * Fetches visitation history, parole records, and work programs for the inmate.
+   */
   useEffect(() => {
     fetchInmateDetails();
 
@@ -89,7 +127,7 @@ const ViewInmate = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <PagesNavLayout title="Inmate Details">
+    <PagesNavLayout>
       <div className="w-full h-screen bg-white shadow-md p-6">
         {/* Header Section */}
         <div className="flex justify-between items-center p-4 shadow-sm">

@@ -1,3 +1,24 @@
+/**
+ * @file DashboardStats.js
+ * @description Displays key prison statistics in the PrisonSphere system.
+ * @module components/DashboardStats
+ *
+ * This component:
+ * - Fetches real-time prison statistics from the backend.
+ * - Displays inmate counts, rehabilitation numbers, parole hearings, and report counts.
+ * - Uses animations for a smoother user experience.
+ *
+ * Features:
+ * - Uses `Framer Motion` for interactive animations.
+ * - Fetches data securely with authentication tokens.
+ * - Dynamically updates statistics upon successful API response.
+ *
+ * @requires react - React library for building UI components.
+ * @requires axios - Library for making HTTP requests.
+ * @requires react-icons - Provides icons for visual representation.
+ * @requires framer-motion - Animation library for smooth transitions.
+ */
+
 import React, { useEffect, useState } from "react";
 import {
   FaUserFriends,
@@ -11,13 +32,21 @@ import { motion } from "framer-motion";
 /**
  * DashboardStats Component
  * ------------------------
- * Displays key statistics for the prison system.
- * Fetches real-time data from the backend and updates dynamically.
+ * - Fetches and displays key statistics for the prison system.
+ * - Uses icons for better visual representation.
+ *
+ * @component
+ * @returns {JSX.Element} - The dashboard statistics UI component.
  */
-
 const DashboardStats = () => {
   const [stats, setStats] = useState(null); //initialize as null
 
+  /**
+   * Fetch Dashboard Statistics
+   * --------------------------
+   * - Calls the API to retrieve key prison statistics.
+   * - Updates the `stats` state with the response data.
+   */
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -45,7 +74,11 @@ const DashboardStats = () => {
     fetchStats();
   }, []);
 
-  // Stats Data
+  /**
+   * Data Structure for Displaying Statistics
+   * ----------------------------------------
+   * - Maps API response data to display key statistics dynamically.
+   */
   const statsData = [
     {
       label: "Total Inmates",

@@ -1,30 +1,54 @@
+/**
+ * @file dashboardController.js
+ * @description Handles dashboard-related data retrieval for key prison statistics and analytics.
+ * @module controllers/dashboardController
+ *
+ * This module:
+ * - Provides prison-wide statistics for the dashboard.
+ * - Fetches inmate distribution and trends over time.
+ * - Uses MongoDB aggregation for optimized data retrieval.
+ *
+ * @requires mongoose - MongoDB ODM library.
+ * @requires Inmate - Inmate model schema.
+ * @requires Report - Report model schema.
+ * @requires Parole - Parole model schema.
+ */
+
 const Inmate = require("../models/Inmate");
 const Report = require("../models/Report");
 const Parole = require("../models/Parole");
 
 /**
- * @desc Get Dashboard Stats
- * @route GET /prisonsphere/dashboard/stats
+ * Get Dashboard Stats
+ * -------------------
+ * - Retrieves key prison statistics for dashboard display.
+ * - Includes total inmates, rehabilitation count, upcoming parole hearings, and recent reports.
+ *
+ * @route  GET /prisonsphere/dashboard/stats
  * @access Admin & Warden
  *
- * Provides key prison statistics:
- * - Total inmates
- * - Inmates in rehabilitation
- * - Upcoming parole hearings
- * - Recent reports generated
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} JSON response with total inmate count, rehabilitation count, upcoming parole hearings, and recent reports.
  */
-
 const getDashboardStats = async (req, res) => {
   try {
+    // **Count total inmates in the system**
     const totalInmates = await Inmate.countDocuments();
+
+    // **Count inmates currently in rehabilitation**
     const inRehabilitation = await Inmate.countDocuments({
       status: "In Rehabilitation",
     });
+
+    // **Count upcoming parole hearings (future dates)**
     const upcomingParole = await Parole.countDocuments({
       hearingDate: { $gte: new Date() },
     });
+
+    // **Count reports generated in the last 30 days**
     const recentReports = await Report.countDocuments({
-      createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+      createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }, // Last 30 days
     });
 
     res.json({ totalInmates, inRehabilitation, upcomingParole, recentReports });
@@ -35,14 +59,21 @@ const getDashboardStats = async (req, res) => {
     });
   }
 };
+
 /**
- * @desc Get Dashboard Analytics Data
- * @route GET /prisonsphere/dashboard/analytics
+ * Get Dashboard Analytics Data
+ * ----------------------------
+ * - Provides inmate count trends and distribution for visual analytics.
+ * - Includes:
+ *   - Inmate count per month (last 6 months) for a line chart.
+ *   - Inmate distribution (Incarcerated, Released, Parole) for a pie chart.
+ *
+ * @route  GET /prisonsphere/dashboard/analytics
  * @access Admin & Warden
  *
- * Provides:
- * - Inmate count per month (last 6 months) for the line chart.
- * - Inmate distribution (Incarcerated, Released, Parole) for the pie chart.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} JSON response with inmate count trends and distribution data.
  */
 const getDashboardAnalytics = async (req, res) => {
   try {
@@ -51,17 +82,17 @@ const getDashboardAnalytics = async (req, res) => {
 
     // Fetch monthly inmate count for the last 6 months
     const monthlyInmateStats = await Inmate.aggregate([
-      { $match: { createdAt: { $gte: sixMonthsAgo } } },
+      { $match: { createdAt: { $gte: sixMonthsAgo } } }, // Filter by last 6 months
       {
         $group: {
-          _id: { $month: "$createdAt" },
-          count: { $sum: 1 },
+          _id: { $month: "$createdAt" }, // Group by month
+          count: { $sum: 1 }, // Count inmates per month
         },
       },
       { $sort: { _id: 1 } }, // Ensure months are sorted correctly
     ]);
 
-    // Fetch inmate distribution
+    // **Fetch inmate distribution for a pie chart**
     const incarceratedCount = await Inmate.countDocuments({
       status: "Incarcerated",
     });

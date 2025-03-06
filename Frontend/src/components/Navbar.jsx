@@ -1,8 +1,39 @@
+/**
+ * @file Navbar.js
+ * @description Responsive and animated navigation bar for the PrisonSphere system.
+ * @module components/Navbar
+ *
+ * This component:
+ * - Displays the system's logo and branding.
+ * - Provides conditional links for "Login" and "Back to Home".
+ * - Uses Framer Motion for smooth animations.
+ * - Implements a responsive and visually appealing navigation bar.
+ *
+ * Features:
+ * - Animates into view when the page loads.
+ * - Adapts to different pages by conditionally showing navigation links.
+ *
+ * @requires react - React library for building UI components.
+ * @requires react-router-dom - Library for managing navigation.
+ * @requires framer-motion - Animation library for smooth transitions.
+ */
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import logo from "../assets/images/logoBlue.png";
 
+/**
+ * Navbar Component
+ * ----------------
+ * - Displays the PrisonSphere logo and branding.
+ * - Conditionally renders navigation links based on `showBackLink` and `showLoginLink` props.
+ *
+ * @component
+ * @param {boolean} showBackLink - Determines if the "Back to Home" link should be displayed.
+ * @param {boolean} showLoginLink - Determines if the "Login" link should be displayed.
+ * @returns {JSX.Element} - The navigation bar component.
+ */
 const Navbar = ({ showBackLink, showLoginLink }) => {
   return (
     <motion.nav

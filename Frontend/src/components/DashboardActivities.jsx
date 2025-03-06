@@ -1,3 +1,24 @@
+/**
+ * @file DashboardActivities.js
+ * @description Displays recent activities logged in the PrisonSphere system.
+ * @module components/DashboardActivities
+ *
+ * This component:
+ * - Fetches and displays recent system-wide activities.
+ * - Uses animations for smooth UI updates.
+ * - Automatically refreshes activities every 60 seconds.
+ *
+ * Features:
+ * - Maps activity types to corresponding icons for better visualization.
+ * - Displays loading indicators when fetching data.
+ * - Uses Framer Motion for animations.
+ *
+ * @requires react - React library for building UI components.
+ * @requires axios - Library for making HTTP requests.
+ * @requires framer-motion - Animation library for smooth transitions.
+ * @requires react-icons - Provides activity icons for better UI representation.
+ */
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -11,7 +32,10 @@ import {
 import { motion } from "framer-motion";
 
 /**
- * Maps activity types to corresponding React Icons
+ * Maps activity types to corresponding React Icons.
+ *
+ * @param {String} activityType - The type of activity being logged.
+ * @returns {JSX.Element} - Corresponding icon component.
  */
 const getActivityIcon = (activityType) => {
   const icons = {
@@ -31,16 +55,21 @@ const getActivityIcon = (activityType) => {
 /**
  * DashboardActivities Component
  * -----------------------------
- * Fetches and displays recent system-wide activities with animations and better UI.
+ * - Fetches and displays recent system-wide activities.
+ * - Uses animations for a smooth user experience.
+ *
+ * @component
+ * @returns {JSX.Element} - The recent activities UI component.
  */
 const DashboardActivities = () => {
-  const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState([]); // Holds fetched activity logs
+  const [loading, setLoading] = useState(true); // Indicates loading state
 
   /**
    * Fetch Recent Activities
    * -----------------------
-   * Calls the API to retrieve system-wide activities from the last 24 hours.
+   * - Calls the API to retrieve system-wide activities from the last 24 hours.
+   * - Updates the `activities` state with the response data.
    */
   useEffect(() => {
     const fetchActivities = async () => {
@@ -70,7 +99,7 @@ const DashboardActivities = () => {
 
     fetchActivities();
 
-    // Auto-refresh activities every 60 seconds (optional)
+    // Auto-refresh activities every 60 seconds
     const interval = setInterval(fetchActivities, 60000);
     return () => clearInterval(interval);
   }, []);

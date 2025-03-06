@@ -1,3 +1,22 @@
+/**
+ * @file InmateManagement.js
+ * @description Component for managing inmates, including registration, search, and editing.
+ * @module pages/InmateManagement
+ *
+ * This component:
+ * - Fetches and displays a paginated list of inmates.
+ * - Allows searching for specific inmates.
+ * - Opens a form for registering new inmates or editing existing ones.
+ * - Handles inmate data updates dynamically.
+ *
+ * @requires react - React library for UI components.
+ * @requires axios - HTTP client for API requests.
+ * @requires framer-motion - Animation library for smooth UI transitions.
+ * @requires InmateForm - Component for inmate registration and editing.
+ * @requires InmateList - Component displaying the list of inmates.
+ * @requires SearchBar - Component for searching inmates.
+ */
+
 import React, { useState, useEffect } from "react";
 import PagesNavLayout from "../layouts/PagesNavLayout";
 import { motion } from "framer-motion";
@@ -6,21 +25,32 @@ import InmateForm from "../components/InmateForm";
 import InmateList from "../components/InmatesList";
 import SearchBar from "../components/SearchBar";
 
-const InmateManagement = () => {
-  const [nextInmateID, setNextInmateID] = useState(""); // Holds the next ID
-  const [showForm, setShowForm] = useState(false); // Controls form visibility
-  const [inmates, setInmates] = useState([]); // Holds fetched inmates
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalInmates, setTotalInmates] = useState(0); // Track total inmates
-  const [searchQuery, setSearchQuery] = useState(""); // Store search input
-  const [searchResult, setSearchResult] = useState([]); // Store search results
-  const [isSearching, setIsSearching] = useState(false); // Track search mode
-  const [editInmate, setEditInmate] = useState(null); // Track inmate being edited
-  const limit = 5; // Entries per page
+/**
+ * @component InmateManagement
+ * @description Handles inmate registration, searching, and editing.
+ *
+ * @returns {JSX.Element} - Renders the inmate management interface.
+ */
 
-  // Fetch the next available inmate ID
+const InmateManagement = () => {
+  // **State Variables**
+  const [nextInmateID, setNextInmateID] = useState(""); // Holds the next available inmate ID
+  const [showForm, setShowForm] = useState(false); // Controls form visibility
+  const [inmates, setInmates] = useState([]); // Holds the fetched list of inmates
+  const [loading, setLoading] = useState(true); // Tracks data loading state
+  const [page, setPage] = useState(1); // Tracks current pagination page
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages for pagination
+  const [totalInmates, setTotalInmates] = useState(0); // Tracks total inmates
+  const [searchQuery, setSearchQuery] = useState(""); // Stores user search input
+  const [searchResult, setSearchResult] = useState([]); // Holds search results
+  const [isSearching, setIsSearching] = useState(false); // Tracks search mode (active/inactive)
+  const [editInmate, setEditInmate] = useState(null); // Holds the inmate data being edited
+  const limit = 5; // Number of inmates per page
+
+  /**
+   * Fetches the next available inmate ID from the backend.
+   * Ensures that every new inmate receives a unique identifier.
+   */
   useEffect(() => {
     const fetchNextID = async () => {
       try {
@@ -40,7 +70,10 @@ const InmateManagement = () => {
     fetchNextID();
   }, []);
 
-  // Fetch inmates from the backend
+  /**
+   * Fetches the list of inmates from the backend with pagination.
+   * Updates state variables with fetched data.
+   */
   const fetchInmates = async () => {
     try {
       setLoading(true);
@@ -61,6 +94,11 @@ const InmateManagement = () => {
     }
   };
 
+  /**
+   * Fetches inmates when:
+   * - The user is not searching.
+   * - The page number changes.
+   */
   useEffect(() => {
     if (!searchQuery) {
       setIsSearching(false);
@@ -68,13 +106,19 @@ const InmateManagement = () => {
     }
   }, [page, searchQuery]);
 
-  // Handle edit button click (open form with inmate data)
+  /**
+   * Handles the "Edit" button click by opening the form with inmate data.
+   * @param {Object} inmate - The inmate object to be edited.
+   */
   const handleEditClick = (inmate) => {
     setEditInmate(inmate);
     setShowForm(true);
   };
 
-  // Callback function to refresh inmates after register or edit
+  /**
+   * Callback function that refreshes the inmate list after a successful form submission.
+   * - Used for both new inmate registration and updating existing inmates.
+   */
   const handleFormSuccess = () => {
     fetchInmates(); // Refresh inmate list
     setShowForm(false); // Close form after success
@@ -103,7 +147,7 @@ const InmateManagement = () => {
               setEditInmate(null);
               setShowForm(true);
             }}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition cursor-pointer"
           >
             Register New Inmate
           </motion.button>

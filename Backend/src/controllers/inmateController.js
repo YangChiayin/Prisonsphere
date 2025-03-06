@@ -1,3 +1,20 @@
+/**
+ * @file inmateController.js
+ * @description Manages CRUD operations for inmate records in the PrisonSphere system.
+ * @module controllers/inmateController
+ *
+ * This module provides functionalities to:
+ * - Register new inmates.
+ * - Retrieve, search, and paginate inmate records.
+ * - Update inmate details (including status updates).
+ * - Implement soft deletion (marking an inmate as "Released").
+ * - Generate sequential inmate IDs to maintain record integrity.
+ *
+ * @requires mongoose - ODM library for MongoDB.
+ * @requires Inmate - Inmate model schema.
+ * @requires logRecentActivity - Logs inmate-related activities.
+ */
+
 const mongoose = require("mongoose");
 const Inmate = require("../models/Inmate");
 const {
@@ -54,14 +71,12 @@ const registerInmate = async (req, res) => {
       crimeDetails,
       assignedCell,
     } = req.body;
-
-    // Generate the next available Inmate ID
     const nextInmateID = await generateNextInmateID();
 
-    // Save image URL from Cloudinary if uploaded
+    // Assign profile image if uploaded
     const profileImage = req.file ? req.file.path : "";
 
-    // Create and save the inmate record
+    // Create and store the inmate record
     const inmate = await Inmate.create({
       firstName,
       lastName,
@@ -82,7 +97,6 @@ const registerInmate = async (req, res) => {
       message: "Inmate registered successfully",
       inmate,
       nextInmateID,
-      calculatedReleaseDate: inmate.calculatedReleaseDate,
     });
   } catch (error) {
     console.error("❌ Error registering inmate:", error);
@@ -127,35 +141,58 @@ const getNextInmateID = async (req, res) => {
 };
 
 /**
- * Get All Inmates
- * ---------------
- * - Retrieves all inmates in the system.
- * - Accessible by Admin and Warden.
+ * Retrieve All Inmates
+ * --------------------
+ * - Fetches all inmate records with optional search and pagination.
  *
  * @route  GET /prisonsphere/inmates
  * @access Admin & Warden
  */
 const getAllInmates = async (req, res) => {
   try {
-    let { page = 1, limit = 5 } = req.query; // Default limit changed to 5
-    page = parseInt(page);
-    limit = parseInt(limit);
+    let { page, limit, search } = req.query; // Get query parameters
+    let query = {}; // Default empty query
 
-    const totalInmates = await Inmate.countDocuments(); // Total count
-    const inmates = await Inmate.find()
-      .sort({ createdAt: -1 }) // Sort newest inmates first
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
+    // If a search query exists, filter by Inmate ID or Full Name
+    if (search) {
+      query = {
+        $or: [
+          { inmateID: { $regex: search, $options: "i" } },
+          { firstName: { $regex: search, $options: "i" } },
+          { lastName: { $regex: search, $options: "i" } },
+          {
+            $expr: {
+              $regexMatch: {
+                input: { $concat: ["$firstName", " ", "$lastName"] },
+                regex: search,
+                options: "i",
+              },
+            },
+          },
+        ],
+      };
+    }
+
+    // Check if pagination is requested
+    let inmatesQuery = Inmate.find(query).sort({ createdAt: -1 });
+
+    if (page && limit) {
+      page = parseInt(page);
+      limit = parseInt(limit);
+      inmatesQuery = inmatesQuery.skip((page - 1) * limit).limit(limit);
+    }
+
+    const inmates = await inmatesQuery.lean(); // Fetch inmates
+    const totalInmates = await Inmate.countDocuments(query); // Count matching inmates
 
     res.status(200).json({
       inmates,
       totalInmates,
-      totalPages: Math.ceil(totalInmates / limit),
-      currentPage: page,
+      totalPages: limit ? Math.ceil(totalInmates / limit) : 1,
+      currentPage: page || 1,
     });
   } catch (error) {
-    console.error("❌ Error fetching inmates:", error);
+    console.error("Error fetching inmates:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

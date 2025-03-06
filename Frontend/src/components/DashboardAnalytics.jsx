@@ -1,3 +1,24 @@
+/**
+ * @file DashboardAnalytics.js
+ * @description Displays analytical charts for inmate data in the PrisonSphere system.
+ * @module components/DashboardAnalytics
+ *
+ * This component:
+ * - Fetches analytics data from the backend.
+ * - Displays a **Line Chart** (inmate admissions over the last 6 months).
+ * - Displays a **Pie Chart** (current inmate distribution).
+ *
+ * Features:
+ * - Uses `Chart.js` for data visualization.
+ * - Ensures authentication before fetching data.
+ * - Handles loading states to improve user experience.
+ *
+ * @requires react - React library for building UI components.
+ * @requires axios - Library for making HTTP requests.
+ * @requires react-chartjs-2 - React wrapper for Chart.js.
+ * @requires chart.js - Charting library for data visualization.
+ */
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Line, Pie } from "react-chartjs-2";
@@ -26,13 +47,22 @@ ChartJS.register(
 /**
  * DashboardAnalytics Component
  * ----------------------------
- * Fetches and displays analytics charts:
- * - Line chart (Inmate count over the last 6 months).
- * - Pie chart (Inmate distribution).
+ * - Fetches and displays analytics charts for inmate trends.
+ * - Includes a **Line Chart** (inmate admissions over time).
+ * - Includes a **Pie Chart** (inmate distribution breakdown).
+ *
+ * @component
+ * @returns {JSX.Element} - The analytics dashboard UI component.
  */
 const DashboardAnalytics = () => {
   const [analytics, setAnalytics] = useState(null);
 
+  /**
+   * Fetch Analytics Data
+   * --------------------
+   * - Calls the API to retrieve inmate trends and distribution data.
+   * - Updates the `analytics` state with the response data.
+   */
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
@@ -62,7 +92,10 @@ const DashboardAnalytics = () => {
     return <p className="text-gray-500 mt-4">Loading analytics...</p>;
   }
 
-  // Line Chart Data (Inmate Count Over Time)
+  /**
+   * Line Chart Data (Inmate Count Over Time)
+   * - Maps API response data to display admissions for the last 6 months.
+   */
   const lineChartData = {
     labels: analytics.monthlyInmateStats.map((stat) => `Month ${stat._id}`),
     datasets: [
@@ -75,7 +108,10 @@ const DashboardAnalytics = () => {
     ],
   };
 
-  // Pie Chart Data (Inmate Distribution)
+  /**
+   * Pie Chart Data (Inmate Distribution)
+   * - Displays the proportion of incarcerated, released, and paroled inmates.
+   */
   const pieChartData = {
     labels: ["Incarcerated", "Released", "In Parole"],
     datasets: [

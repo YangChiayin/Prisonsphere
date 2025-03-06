@@ -1,27 +1,83 @@
-import React, { useState } from "react";
-import { FaBell, FaUserShield, FaUserCog } from "react-icons/fa"; // Icons for Notifications & Roles
+/**
+ * @file TopNavbar.js
+ * @description Displays a top navigation bar with user role icon, title, description, and notification alerts.
+ * @module components/TopNavbar
+ *
+ * This component:
+ * - Fetches and displays parole hearing notifications.
+ * - Provides a dropdown menu for alerts with animated transitions.
+ * - Dynamically adjusts the displayed user role icon.
+ *
+ * Features:
+ * - Uses `Framer Motion` for smooth dropdown animations.
+ * - Fetches real-time parole hearing notifications from the backend.
+ * - Displays a bell icon with an alert count when new notifications arrive.
+ *
+ * @requires react - React library for UI rendering.
+ * @requires axios - Library for making HTTP requests.
+ * @requires react-icons - Provides icons for better UX.
+ * @requires framer-motion - Animation library for dropdown effects.
+ */
 
+import React, { useState, useEffect } from "react";
+import { FaBell, FaUserShield, FaUserCog, FaTimes } from "react-icons/fa"; // Added Close Icon
+import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+
+/**
+ * TopNavbar Component
+ * -------------------
+ * - Displays the page title, user role, and notifications.
+ * - Fetches parole hearing alerts dynamically.
+ *
+ * @component
+ * @param {string} role - The role of the user (warden/admin).
+ * @param {string} title - The title of the current page.
+ * @param {string} description - The description of the page's purpose.
+ * @returns {JSX.Element} - The top navigation bar UI component.
+ */
 const TopNavbar = ({ role, title, description }) => {
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "New inmate admitted", time: "2 hours ago" },
-    { id: 2, message: "Rehabilitation program scheduled", time: "4 hours ago" },
-    { id: 3, message: "Parole hearing completed", time: "8 hours ago" },
-    { id: 4, message: "Monthly report generated", time: "8 hours ago" },
-  ]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]); // Stores fetched parole notifications
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Controls notification dropdown visibility
 
   // Select appropriate icon based on user role
   const RoleIcon = role === "warden" ? FaUserShield : FaUserCog;
 
+  /**
+   * Fetch Parole Notifications
+   * --------------------------
+   * - Calls the API to retrieve upcoming parole hearings.
+   * - Updates the `notifications` state with the response data.
+   */
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/prisonsphere/paroles/upcoming",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setNotifications(response.data);
+      } catch (error) {
+        console.error("Error fetching upcoming parole notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <div className="flex items-center justify-between bg-white shadow-md px-6 py-4 sticky w-full top-0 z-50">
       {/* Page Title & Description */}
-      <div className="PageTitle">
+      <div>
         <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
         <p className="text-sm text-gray-600">{description}</p>
       </div>
 
-      <div className="flex justify-center items-center space-x-5">
+      <div className="flex items-center space-x-5">
         {/* Notification Bell */}
         <div className="relative">
           <button
@@ -36,31 +92,62 @@ const TopNavbar = ({ role, title, description }) => {
             )}
           </button>
 
-          {/* Notification Dropdown */}
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-3 bg-white shadow-lg rounded-lg w-64 p-4 z-50">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                Notifications
-              </h3>
-              {notifications.length > 0 ? (
-                <ul>
-                  {notifications.map((notif) => (
-                    <li
-                      key={notif.id}
-                      className="text-gray-600 text-sm border-b last:border-none py-2"
-                    >
-                      {notif.message}{" "}
-                      <span className="text-xs text-gray-400">
-                        ({notif.time})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 text-sm">No new notifications</p>
-              )}
-            </div>
-          )}
+          {/* Notification Dropdown with Motion */}
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute right-0 mt-3 bg-white shadow-lg rounded-lg w-72 p-4 z-50"
+              >
+                <div className="flex justify-between items-center border-b pb-2">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Notifications
+                  </h3>
+                  <button onClick={() => setIsDropdownOpen(false)}>
+                    <FaTimes className="text-gray-500 hover:text-red-500" />
+                  </button>
+                </div>
+
+                {notifications.length > 0 ? (
+                  <ul className="mt-2 space-y-2">
+                    {notifications.map((notif) => (
+                      <motion.li
+                        key={notif._id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-md shadow-sm border-l-4 border-blue-500"
+                      >
+                        {/* Inmate Name & ID (Formatted Properly) */}
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-800">
+                            {notif.inmate.firstName} {notif.inmate.lastName}
+                          </span>
+                          <span className="text-xs text-gray-500 font-semibold">
+                            ID: {notif.inmate.inmateID}
+                          </span>
+                        </div>
+
+                        {/* Parole Hearing Date */}
+                        <p className="text-gray-700 text-sm mt-1">
+                          Parole hearing on{" "}
+                          <span className="font-semibold">
+                            {new Date(notif.hearingDate).toLocaleDateString()}
+                          </span>
+                        </p>
+                      </motion.li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 text-sm text-center mt-2">
+                    No upcoming parole hearings
+                  </p>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* User Role Icon */}

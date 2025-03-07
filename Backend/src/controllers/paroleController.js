@@ -45,7 +45,7 @@ const submitParoleApplication = async (req, res) => {
     // Create a new parole application
     const parole = await Parole.create({
       inmate,
-      hearingDate,
+      hearingDate: new Date(hearingDate + "T00:00:00.000Z"),
     });
 
     // Log activity
@@ -127,7 +127,15 @@ const getAllParoleApplications = async (req, res) => {
       .populate("inmate", "firstName lastName inmateID profilePicture")
       .skip((page - 1) * limit)
       .limit(Number(limit))
-      .sort({ hearingDate: 1 });
+      .sort({ hearingDate: 1 })
+      .lean();
+
+    // Convert hearingDate to local time before sending response
+    paroles.forEach((parole) => {
+      parole.hearingDate = new Date(parole.hearingDate)
+        .toISOString()
+        .split("T")[0]; // Keep YYYY-MM-DD format
+    });
 
     res.status(200).json({
       paroles,

@@ -113,7 +113,7 @@ const DashboardAnalytics = () => {
    * - Displays the proportion of incarcerated, released, and paroled inmates.
    */
   const pieChartData = {
-    labels: ["Incarcerated", "Released", "In Parole"],
+    labels: ["Incarcerated", "Released", "On Parole"],
     datasets: [
       {
         data: [

@@ -1,47 +1,33 @@
 /**
- * @file dashboardRoutes.js
- * @description Defines routes for fetching dashboard statistics and analytics data.
- * @module routes/dashboardRoutes
+ * @file recentActivityLogRoutes.js
+ * @description Defines the route for fetching recent activity logs within the last 24 hours.
+ * @module routes/recentActivityLogRoutes
  *
- * This module:
- * - Provides key prison statistics for the dashboard.
- * - Retrieves analytics data for visualization (inmate trends, parole stats, etc.).
+ * Features:
+ * - Uses `express.Router()` to define an API endpoint.
+ * - Implements role-based access using authentication middleware.
+ * - Fetches recent activities from the system logs.
  *
- * Routes:
- * - `GET /prisonsphere/dashboard/stats` → Fetches key dashboard statistics.
- * - `GET /prisonsphere/dashboard/analytics` → Retrieves analytics data for charts and reports.
- *
- * Middleware:
- * - **protect**: Ensures only authenticated users can access dashboard data.
- *
- * @requires express - Express framework for handling routes.
- * @requires dashboardController - Controller for fetching dashboard stats and analytics.
- * @requires authMiddleware - Middleware for authentication enforcement.
+ * @requires express - Express.js framework for routing.
+ * @requires getRecentActivities - Controller function that retrieves the activity log.
+ * @requires protect - Middleware that ensures only authenticated users can access this route.
  */
 
 const express = require("express");
 const {
-  getDashboardStats,
-  getDashboardAnalytics,
-} = require("../controllers/dashboardController");
+  getRecentActivities,
+} = require("../controllers/recentActivityLogController");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 /**
- * @route   GET /prisonsphere/dashboard/stats
- * @desc    Fetches key prison statistics for the dashboard.
- * @access  Private (Admin & Warden)
- * @middleware protect - Ensures only authenticated users can access the dashboard.
+ * @route GET /prisonsphere/recent-activities
+ * @description Retrieves recent activity logs from the past 24 hours.
+ * @access Protected (Authenticated Users)
+ * @middleware protect - Ensures only logged-in users can access the endpoint.
+ * @controller getRecentActivities - Fetches the recent activity logs.
  */
-router.get("/stats", protect, getDashboardStats);
-
-/**
- * @route   GET /prisonsphere/dashboard/analytics
- * @desc    Retrieves analytics data for inmate trends and reports.
- * @access  Private (Admin & Warden)
- * @middleware protect - Ensures only authenticated users can access the dashboard analytics.
- */
-router.get("/analytics", protect, getDashboardAnalytics);
+router.get("/", protect, getRecentActivities);
 
 module.exports = router;

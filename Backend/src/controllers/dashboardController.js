@@ -17,6 +17,7 @@
 const Inmate = require("../models/Inmate");
 const Report = require("../models/Report");
 const Parole = require("../models/Parole");
+const WorkProgramEnrollment = require("../models/WorkProgramEnrollment");
 
 /**
  * Get Dashboard Stats
@@ -37,8 +38,8 @@ const getDashboardStats = async (req, res) => {
     const totalInmates = await Inmate.countDocuments();
 
     // **Count inmates currently in rehabilitation**
-    const inRehabilitation = await Inmate.countDocuments({
-      status: "In Rehabilitation",
+    const inRehabilitation = await WorkProgramEnrollment.countDocuments({
+      status: "Active", // Count only active work program enrollments
     });
 
     // **Count upcoming parole hearings (future dates)**

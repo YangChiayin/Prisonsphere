@@ -1,20 +1,47 @@
+/**
+ * @file BehavioralLog.js
+ * @description Defines the schema for logging inmate behavior during work programs.
+ * @module models/BehavioralLog
+ *
+ * Features:
+ * - Logs inmate behavior on a weekly basis.
+ * - Tracks work ethic, cooperation, incident reports, and social skills.
+ * - Used for calculating performance rating when work programs are completed.
+ *
+ * @requires mongoose - MongoDB ODM library.
+ */
+
 const mongoose = require("mongoose");
 
-const behaviorLogSchema = new mongoose.Schema(
+/**
+ * @typedef BehavioralLog
+ * @property {ObjectId} inmateId - Reference to the assigned inmate.
+ * @property {ObjectId} workProgramId - Reference to the work program enrollment.
+ * @property {Number} workEthic - Rating (1-5) for work ethic.
+ * @property {Number} cooperation - Rating (1-5) for cooperation.
+ * @property {Number} incidentReports - Number of incidents (lower is better).
+ * @property {Number} socialSkills - Rating (1-5) for social adaptability.
+ * @property {Date} loggedAt - The date the behavior was logged (weekly).
+ */
+const behavioralLogSchema = new mongoose.Schema(
   {
-    inmate: {
+    inmateId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Inmate",
       required: true,
     },
-    workEthicRating: { type: Number, min: 1, max: 5 },
-    cooperationRating: { type: Number, min: 1, max: 5 },
-    incidentReports: { type: String },
-    socialSkillProgress: { type: String },
-    loggedBy: { type: String },
-    dateLogged: { type: Date, default: Date.now },
+    workProgramId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "WorkProgramEnrollment",
+      required: true,
+    },
+    workEthic: { type: Number, required: true, min: 1, max: 5 },
+    cooperation: { type: Number, required: true, min: 1, max: 5 },
+    incidentReports: { type: Number, default: 0, min: 0 },
+    socialSkills: { type: Number, required: true, min: 1, max: 5 },
+    loggedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("BehaviorLog", behaviorLogSchema);
+module.exports = mongoose.model("BehaviorLog", behavioralLogSchema);

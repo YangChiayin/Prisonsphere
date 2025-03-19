@@ -16,7 +16,6 @@
  * @requires searchInmate - Controller function for searching inmates.
  * @requires getInmateById - Controller function for retrieving a specific inmate.
  * @requires updateInmate - Controller function for updating inmate details.
- * @requires deleteInmate - Controller function for deleting an inmate record.
  * @requires protect - Middleware function for authentication.
  * @requires isWarden - Middleware function for role-based access control (Warden only).
  * @requires upload - Middleware function for handling profile image uploads.
@@ -30,6 +29,8 @@ const {
   searchInmate,
   getInmateById,
   updateInmate,
+  getInmateByIDReport,
+  getInmatePDFReport,
   deleteInmate,
 } = require("../controllers/inmateController");
 
@@ -103,13 +104,18 @@ router.put(
 );
 
 /**
- * @route   DELETE /prisonsphere/inmates/:id
- * @desc    Delete an inmate record (soft delete).
- * @access  Private (Warden only)
- * @middleware protect - Ensures user is authenticated.
- * @middleware isWarden - Restricts access to wardens only.
+ * @route   GET /prisonsphere/inmates/report/:id
+ * @desc    Get full inmate details for report generation.
+ * @access  Private (Admin & Warden)
  */
-router.delete("/:id", protect, isWarden, deleteInmate);
+router.get("/report/:id", protect, getInmateByIDReport);
+
+/**
+ * @route   GET /prisonsphere/inmates/report/:id/pdf
+ * @desc    Generate and download inmate report as PDF.
+ * @access  Private (Admin & Warden)
+ */
+router.get("/report/:id/pdf/:type", protect, getInmatePDFReport);
 
 // Export the router to be used in the main application
 module.exports = router;

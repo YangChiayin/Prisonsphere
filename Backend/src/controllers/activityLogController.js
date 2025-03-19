@@ -1,46 +1,81 @@
+/**
+ * @file activityLogController.js
+ * @description Controller for managing inmate activity logs in work programs.
+ * @module controllers/activityLogController
+ *
+ * Features:
+ * - Logs inmate participation in work-related activities.
+ * - Fetches activity logs for a specific inmate.
+ *
+ * @requires mongoose - MongoDB ODM library.
+ * @requires ActivityLog - The Activity Log model.
+ * @requires logRecentActivity - Function to log activities in the system.
+ */
+
 const ActivityLog = require("../models/ActivityLog");
-const Inmate = require("../models/Inmate");
 
-// @desc   Create an Activity Log Entry
-// @route  POST /prisonsphere/activity-logs
-// @access Warden Only
-const createActivityLog = async (req, res) => {
+/**
+ * Log Inmate Activity in a Work Program
+ * -------------------------------------
+ * - Records daily participation in work-related activities.
+ *
+ * @route   POST /prisonsphere/activity-logs
+ * @access  Warden
+ *
+ * @param {Object} req - Express request object containing log details.
+ * @param {Object} res - Express response object.
+ */
+const logActivity = async (req, res) => {
   try {
-    const { inmate, activityType, description, date, loggedBy } = req.body;
+    const { inmateId, activityType, description } = req.body;
 
-    const existingInmate = await Inmate.findById(inmate);
-    if (!existingInmate)
-      return res.status(404).json({ message: "Inmate not found" });
+    if (!inmateId || !activityType || !description) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
 
-    const activityLog = await ActivityLog.create({
-      inmate,
+    const newActivityLog = new ActivityLog({
+      inmateId,
       activityType,
       description,
-      date,
-      loggedBy,
     });
 
-    res
-      .status(201)
-      .json({ message: "Activity log created successfully", activityLog });
+    await newActivityLog.save();
+
+    res.status(201).json({ message: "Activity logged successfully!" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-// @desc   Get All Activity Logs
-// @route  GET /prisonsphere/activity-logs
-// @access Admin & Warden
-const getAllActivityLogs = async (req, res) => {
+/**
+ * Fetch All Activity Logs for an Inmate
+ * -------------------------------------
+ * - Retrieves all activity logs recorded for an inmate.
+ *
+ * @route   GET /prisonsphere/activity-logs/inmate/:inmateId
+ * @access  Admin & Warden
+ */
+const getActivityLogsForInmate = async (req, res) => {
   try {
-    const logs = await ActivityLog.find().populate(
-      "inmate",
-      "firstName lastName inmateID"
-    );
-    res.status(200).json(logs);
+    const { inmateId } = req.params;
+    const { page = 1, limit = 2 } = req.query; // Default to page 1, 2 logs per page
+
+    const skip = (page - 1) * limit;
+
+    const totalLogs = await ActivityLog.countDocuments({ inmateId });
+
+    const logs = await ActivityLog.find({ inmateId })
+      .sort({ createdAt: -1 }) // Show latest logs first
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    res.status(200).json({
+      logs,
+      totalLogs,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-module.exports = { createActivityLog, getAllActivityLogs };
+module.exports = { logActivity, getActivityLogsForInmate };

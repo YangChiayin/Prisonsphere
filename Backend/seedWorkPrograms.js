@@ -3,18 +3,14 @@
  * @description Seeds initial work programs into the database for the PrisonSphere system.
  * @module utils/seedWorkPrograms
  *
- * This script:
- * - Connects to MongoDB and inserts predefined work programs.
+ * Features:
  * - Deletes existing records before inserting new ones to avoid duplicates.
- * - Provides structured work opportunities for inmates.
+ * - Provides predefined work programs to populate the system.
+ * - Uses environment variables to securely connect to the database.
  *
  * Usage:
  * - Run this script manually to populate the database with default work programs.
  * - Command: `node seedWorkPrograms.js`
- *
- * Security Considerations:
- * - Uses environment variables to securely connect to the database.
- * - Prevents redundant seeding by clearing existing records before inserting.
  *
  * @requires mongoose - MongoDB ODM library.
  * @requires dotenv - Loads environment variables.
@@ -24,8 +20,8 @@
 
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const connectDB = require("./src/config/db");
-const WorkProgram = require("./src/models/WorkProgram");
+const connectDB = require("../config/db");
+const WorkProgram = require("../models/WorkProgram");
 
 dotenv.config();
 connectDB();
@@ -67,8 +63,8 @@ const seedWorkPrograms = async () => {
   ];
 
   try {
-    await WorkProgram.deleteMany(); // **Clear existing records before seeding**
-    await WorkProgram.insertMany(workPrograms); // **Insert new work programs**
+    await WorkProgram.deleteMany(); // Clear existing records before seeding
+    await WorkProgram.insertMany(workPrograms); // Insert new work programs
     console.log("Work Programs Seeded Successfully!");
     process.exit();
   } catch (error) {

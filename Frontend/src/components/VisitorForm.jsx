@@ -111,6 +111,26 @@ const VisitorForm = ({ inmateId, visitorData, onClose, onFormSuccess }) => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+
+      // Check inmate's status before allowing visitor logging
+      const checkResponse = await axios.get(
+        `http://localhost:5000/prisonsphere/inmates/${inmateId}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      const { status } = checkResponse.data;
+
+      // Prevent visitor logging if inmate is not incarcerated
+      if (status !== "Incarcerated") {
+        toast.error(
+          "⚠ Visitor logging denied. This inmate is not incarcerated."
+        );
+        setLoading(false);
+        return;
+      }
+
       let response;
 
       if (isEditMode) {
@@ -150,7 +170,7 @@ const VisitorForm = ({ inmateId, visitorData, onClose, onFormSuccess }) => {
       toast.error("⚠ Error processing request. Try again.", {
         position: "top-right",
       });
-      console.error("❌ Error:", error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }

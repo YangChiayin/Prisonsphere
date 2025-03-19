@@ -109,7 +109,7 @@ const getRecentActivities = async (req, res) => {
 
     res.status(200).json(recentActivities);
   } catch (error) {
-    console.error("❌ Error fetching recent activities:", error);
+    console.error("Error fetching recent activities:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -156,8 +156,19 @@ const generateActivityMessage = (activityType, count) => {
       "inmate",
       count
     )} enrolled in a work program`,
+    WORK_PROGRAM_COMPLETED: `${pluralize("work program", count)} was completed`,
 
-    REPORT_GENERATED: `An inmate report was generated`,
+    // Behavioral Log Messages
+    BEHAVIOR_LOGGED: `${pluralize(
+      "behavior log",
+      count
+    )} recorded for an inmate`,
+
+    // Activity Log Messages
+    ACTIVITY_LOGGED: `${pluralize(
+      "activity log",
+      count
+    )} recorded for an inmate`,
   };
 
   // Return the appropriate message or a default one if the type isn't defined

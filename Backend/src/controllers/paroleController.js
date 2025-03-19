@@ -39,21 +39,44 @@ const submitParoleApplication = async (req, res) => {
 
     // Ensure the inmate exists before proceeding
     const existingInmate = await Inmate.findById(inmate);
-    if (!existingInmate)
+    if (!existingInmate) {
       return res.status(404).json({ message: "Inmate not found" });
+    }
+
+    // Check if the inmate is still incarcerated
+    if (existingInmate.status !== "Incarcerated") {
+      return res.status(400).json({
+        message:
+          "⚠ Parole request cannot be submitted. This inmate is not incarcerated.",
+      });
+    }
+
+    // Check if the inmate already has a pending parole application
+    const existingParole = await Parole.findOne({ inmate, status: "Pending" });
+
+    if (existingParole) {
+      return res.status(400).json({
+        message: "⚠ You already have a pending parole request.",
+      });
+    }
+
+    // Ensure the hearingDate is stored correctly in local time
+    const parsedHearingDate = new Date(hearingDate);
+    parsedHearingDate.setUTCHours(12, 0, 0, 0); // Store at noon UTC to avoid timezone shifts
 
     // Create a new parole application
     const parole = await Parole.create({
       inmate,
-      hearingDate: new Date(hearingDate + "T00:00:00.000Z"),
+      hearingDate: parsedHearingDate,
     });
 
     // Log activity
     await logRecentActivity("PAROLE_SUBMITTED");
 
-    res
-      .status(201)
-      .json({ message: "Parole application submitted successfully", parole });
+    res.status(201).json({
+      message: "Parole application submitted successfully",
+      parole,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

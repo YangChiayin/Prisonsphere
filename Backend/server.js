@@ -38,10 +38,10 @@ const authRoutes = require("./src/routes/authRoutes");
 const inmateRoutes = require("./src/routes/inmateRoutes");
 const visitorRoutes = require("./src/routes/visitorRoutes");
 const paroleRoutes = require("./src/routes/paroleRoutes");
-const workProgramRoutes = require("./src/routes/workProgramRoutes");
-const behaviorLogRoutes = require("./src/routes/behaviorLogRoutes");
-const activityLogRoutes = require("./src/routes/activityLogRoutes");
-const reportRoutes = require("./src/routes/reportRoutes");
+const workProgramRoutes = require("./src/routes/workProgramRoute");
+const workProgramEnrollmentRoutes = require("./src/routes/workProgramEnrollmentRoutes"); // Work Program Enrollments
+const behaviorLogRoutes = require("./src/routes/behaviorLogRoutes"); // Behavioral Logs
+const activityLogRoutes = require("./src/routes/activityLogRoutes"); // Activity Logs
 const dashboardRoutes = require("./src/routes/dashboardRoutes");
 const recentActivityLogRoutes = require("./src/routes/recentActivityLogRoutes");
 
@@ -88,9 +88,9 @@ app.use("/prisonsphere/inmates", inmateRoutes);
 app.use("/prisonsphere/visitors", visitorRoutes);
 app.use("/prisonsphere/paroles", paroleRoutes);
 app.use("/prisonsphere/work-programs", workProgramRoutes);
+app.use("/prisonsphere/work-programs/enrollments", workProgramEnrollmentRoutes);
 app.use("/prisonsphere/behavior-logs", behaviorLogRoutes);
 app.use("/prisonsphere/activity-logs", activityLogRoutes);
-app.use("/prisonsphere/reports", reportRoutes);
 
 // **Use Global Error Handling Middleware**
 app.use(errorHandler);

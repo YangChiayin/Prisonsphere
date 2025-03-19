@@ -96,11 +96,7 @@ const VisitorHistory = () => {
     <PagesNavLayout>
       <div className="space-y-4">
         {/* Title & New Visit Button */}
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-semibold text-gray-800">
-            Visitor History
-          </h3>
-
+        <div className="flex justify-end items-center">
           <div className="space-x-5">
             {/* Back Button */}
             <button

@@ -192,18 +192,27 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
         );
       }
     } catch (error) {
-      console.error("❌ Error processing inmate update:", error);
-      toast.error(
-        "⚠ Failed to process inmate. Check the console for details.",
-        {
+      // Suppress Axios Logging by Manually Handling Errors**
+      if (!error.response) return; // Prevents unnecessary logging
+
+      const { status, data } = error.response;
+
+      if (status === 403) {
+        toast.error("You do not have permission to perform this action.", {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        }
-      );
+        });
+      } else if (status === 404) {
+        toast.error("⚠ Resource not found. Please check your input.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error(data?.message || "⚠ Action failed. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     }
   };
 

@@ -38,7 +38,9 @@ import axios from "axios";
  */
 const TopNavbar = ({ role, title, description }) => {
   const [notifications, setNotifications] = useState([]); // Stores fetched parole notifications
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Controls notification dropdown visibility
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Controls dropdown visibility
+  const [visibleCount, setVisibleCount] = useState(5); // Shows only 5 items initially
+  const [dropdownHeight, setDropdownHeight] = useState("max-h-[320px]"); // Default dropdown height
 
   // Select appropriate icon based on user role
   const RoleIcon = role === "warden" ? FaUserShield : FaUserCog;
@@ -47,7 +49,6 @@ const TopNavbar = ({ role, title, description }) => {
    * Fetch Parole Notifications
    * --------------------------
    * - Calls the API to retrieve upcoming parole hearings.
-   * - Updates the `notifications` state with the response data.
    */
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -68,6 +69,17 @@ const TopNavbar = ({ role, title, description }) => {
 
     fetchNotifications();
   }, []);
+
+  // Function to handle expanding the dropdown
+  const handleLoadMore = () => {
+    if (visibleCount + 5 < notifications.length) {
+      setVisibleCount(visibleCount + 5);
+      setDropdownHeight("max-h-[500px]"); // Expand height to fit more items
+    } else {
+      setVisibleCount(notifications.length);
+      setDropdownHeight("max-h-[80vh]"); // Limit expansion to 80% of the screen
+    }
+  };
 
   return (
     <div className="flex items-center justify-between bg-white shadow-md px-6 py-4 sticky w-full top-0 z-50">
@@ -99,47 +111,61 @@ const TopNavbar = ({ role, title, description }) => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 mt-3 bg-white shadow-lg rounded-lg w-72 p-4 z-50"
+                className={`absolute right-0 mt-3 bg-white shadow-lg rounded-lg w-80 p-4 z-50 border border-gray-300 transition-all duration-300 ${dropdownHeight} overflow-y-auto`}
               >
+                {/* Dropdown Header with Close Button */}
                 <div className="flex justify-between items-center border-b pb-2">
                   <h3 className="text-sm font-semibold text-gray-700">
-                    Notifications
+                    Upcoming Parole Hearings
                   </h3>
                   <button onClick={() => setIsDropdownOpen(false)}>
                     <FaTimes className="text-gray-500 hover:text-red-500" />
                   </button>
                 </div>
 
+                {/* Notification List */}
                 {notifications.length > 0 ? (
-                  <ul className="mt-2 space-y-2">
-                    {notifications.map((notif) => (
-                      <motion.li
-                        key={notif._id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-md shadow-sm border-l-4 border-blue-500"
-                      >
-                        {/* Inmate Name & ID (Formatted Properly) */}
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-800">
-                            {notif.inmate.firstName} {notif.inmate.lastName}
-                          </span>
-                          <span className="text-xs text-gray-500 font-semibold">
-                            ID: {notif.inmate.inmateID}
-                          </span>
-                        </div>
+                  <>
+                    <ul className="mt-2 space-y-2">
+                      {notifications.slice(0, visibleCount).map((notif) => (
+                        <motion.li
+                          key={notif._id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-md shadow-sm border-l-4 border-blue-500"
+                        >
+                          {/* Inmate Name & ID */}
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-800">
+                              {notif.inmate.firstName} {notif.inmate.lastName}
+                            </span>
+                            <span className="text-xs text-gray-500 font-semibold">
+                              ID: {notif.inmate.inmateID}
+                            </span>
+                          </div>
 
-                        {/* Parole Hearing Date */}
-                        <p className="text-gray-700 text-sm mt-1">
-                          Parole hearing on{" "}
-                          <span className="font-semibold">
-                            {new Date(notif.hearingDate).toLocaleDateString()}
-                          </span>
-                        </p>
-                      </motion.li>
-                    ))}
-                  </ul>
+                          {/* Parole Hearing Date */}
+                          <p className="text-gray-700 text-sm mt-1">
+                            Parole hearing on{" "}
+                            <span className="font-semibold">
+                              {new Date(notif.hearingDate).toLocaleDateString()}
+                            </span>
+                          </p>
+                        </motion.li>
+                      ))}
+                    </ul>
+
+                    {/* Load More Button */}
+                    {visibleCount < notifications.length && (
+                      <button
+                        onClick={handleLoadMore}
+                        className="mt-4 w-full text-blue-600 hover:underline text-sm text-center"
+                      >
+                        Load More
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <p className="text-gray-500 text-sm text-center mt-2">
                     No upcoming parole hearings

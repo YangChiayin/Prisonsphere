@@ -97,7 +97,7 @@ const DashboardStats = () => {
     },
     {
       label: "Recent Reports",
-      value: stats ? stats.recentReports : 0,
+      value: stats ? stats.inRehabilitation : 0,
       icon: <FaFileAlt className="text-purple-500 text-3xl" />,
     },
   ];

@@ -90,6 +90,13 @@ const logVisitor = async (req, res) => {
       return res.status(404).json({ message: "⚠ Inmate not found." });
     }
 
+    // **Prevent visit logging if inmate is not incarcerated**
+    if (inmate.status !== "Incarcerated") {
+      return res.status(400).json({
+        message: "⚠ Visitor logging denied. This inmate is not incarcerated.",
+      });
+    }
+
     // Create the visitor record
     const visitor = await Visitor.create({
       inmate: inmateId,
@@ -230,7 +237,7 @@ const updateVisitor = async (req, res) => {
       .status(200)
       .json({ message: "Visitor details updated successfully", visitor });
   } catch (error) {
-    console.error("❌ Error updating visitor:", error);
+    console.error("Error updating visitor:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

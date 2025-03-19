@@ -29,6 +29,7 @@ import VisitorDetails from "./pages/VisitorDetails";
 import ParoleManagement from "./pages/ParoleManagement";
 import ParoleDetails from "./pages/ParoleDetails";
 import RehabilitaionAndWork from "./pages/RehabilitaionAndWork";
+import AllWorkProgramEnrollments from "./pages/AllWorkProgramEnrollments";
 import Report from "./pages/Report";
 
 /**
@@ -61,6 +62,10 @@ function App() {
         <Route path="/paroles" element={<ParoleManagement />} />
         <Route path="/paroles/:paroleId" element={<ParoleDetails />} />
         <Route path="/rehabilitation" element={<RehabilitaionAndWork />} />
+        <Route
+          path="/work-programs/enrollments"
+          element={<AllWorkProgramEnrollments />}
+        />
         <Route path="/reports" element={<Report />} />
       </Routes>
     </Router>

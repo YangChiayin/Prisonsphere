@@ -109,6 +109,45 @@ const ParoleForm = ({ onClose, onFormSuccess }) => {
 
     try {
       setLoading(true);
+
+      // Check inmate's status and pending parole in one request**
+      const checkResponse = await axios.get(
+        `http://localhost:5000/prisonsphere/inmates/${selectedInmate._id}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      const { status } = checkResponse.data;
+
+      // Prevent parole request if inmate is not incarcerated**
+      if (status !== "Incarcerated") {
+        toast.error(
+          "⚠ Parole request denied. This inmate is not incarcerated."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Check if the selected inmate has a pending parole**
+      const paroleResponse = await axios.get(
+        `http://localhost:5000/prisonsphere/paroles/inmate/${selectedInmate._id}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      const hasPendingParole = paroleResponse.data.some(
+        (parole) => parole.status === "Pending"
+      );
+
+      if (hasPendingParole) {
+        toast.error("⚠ This inmate has a pending parole request.");
+        setLoading(false);
+        return;
+      }
+
+      //proceed withs submission
       await axios.post(
         "http://localhost:5000/prisonsphere/paroles",
         {

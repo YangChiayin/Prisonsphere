@@ -238,7 +238,12 @@ const ParoleManagement = () => {
 
                       <td className="p-3">
                         {parole.hearingDate
-                          ? new Date(parole.hearingDate).toLocaleDateString()
+                          ? new Date(parole.hearingDate).toLocaleDateString(
+                              "en-CA",
+                              {
+                                timeZone: "UTC",
+                              }
+                            ) // Force UTC time zone to prevent local offset shift
                           : "No Date"}
                       </td>
 

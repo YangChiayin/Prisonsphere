@@ -102,6 +102,12 @@ const PagesNavLayout = ({ children }) => {
         description: "Viewing visitor's record",
       };
     }
+    if (pathname.startsWith("/work-programs/enrollments")) {
+      return {
+        title: "Work Program Enrollmentss",
+        description: "Viewing all Program enrollment in the Facility",
+      };
+    }
     if (pathname.startsWith("/paroles/")) {
       if (pathname.match(/^\/paroles\/[a-zA-Z0-9]+$/)) {
         return {

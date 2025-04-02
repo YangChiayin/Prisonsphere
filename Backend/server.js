@@ -58,7 +58,10 @@ connectDB();
 const app = express();
 
 // Allow requests from frontend and include credentials
-const allowedOrigins = ["http://localhost:5173"]; // Frontend URL
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://prisonsphere.vercel.app",
+];
 
 //Middleware Setup
 app.use(express.json()); // Parse JSON request bodies

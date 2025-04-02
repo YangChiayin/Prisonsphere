@@ -293,7 +293,7 @@ const updateInmate = async (req, res) => {
     let updatedData = { ...req.body };
 
     // Ensure only Wardens can edit inmate details**
-    if (req.user.role !== "Warden") {
+    if (req.user.role !== "warden") {
       return res.status(403).json({
         message: "You do not have permission to edit inmate details.",
       });

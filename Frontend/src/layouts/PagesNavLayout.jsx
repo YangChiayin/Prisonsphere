@@ -104,7 +104,7 @@ const PagesNavLayout = ({ children }) => {
     }
     if (pathname.startsWith("/work-programs/enrollments")) {
       return {
-        title: "Work Program Enrollmentss",
+        title: "Work Program Enrollments",
         description: "Viewing all Program enrollment in the Facility",
       };
     }

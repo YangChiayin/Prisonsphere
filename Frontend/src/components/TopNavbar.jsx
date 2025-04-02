@@ -138,10 +138,11 @@ const TopNavbar = ({ role, title, description }) => {
                           {/* Inmate Name & ID */}
                           <div className="flex justify-between items-center">
                             <span className="font-medium text-gray-800">
-                              {notif.inmate.firstName} {notif.inmate.lastName}
+                              {notif.inmate?.firstName || "Unknown"}{" "}
+                              {notif.inmate?.lastName || ""}
                             </span>
                             <span className="text-xs text-gray-500 font-semibold">
-                              ID: {notif.inmate.inmateID}
+                              ID: {notif.inmate?.inmateID || "N/A"}
                             </span>
                           </div>
 

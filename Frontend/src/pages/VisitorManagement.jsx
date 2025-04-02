@@ -54,7 +54,9 @@ const VisitorManagement = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates?page=${page}&limit=${limit}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/inmates?page=${page}&limit=${limit}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

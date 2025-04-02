@@ -152,7 +152,9 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
 
       if (isEditMode) {
         response = await axios.put(
-          `http://localhost:5000/prisonsphere/inmates/${inmateData._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates/${
+            inmateData._id
+          }`,
           formData,
           {
             headers: {
@@ -164,7 +166,7 @@ const InmateForm = ({ nextInmateID, onClose, inmateData, onFormSuccess }) => {
       } else {
         // New Inmate Registration
         response = await axios.post(
-          "http://localhost:5000/prisonsphere/inmates",
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates`,
           formData,
           {
             headers: {

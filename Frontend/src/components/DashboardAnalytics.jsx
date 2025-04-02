@@ -73,7 +73,9 @@ const DashboardAnalytics = () => {
         }
 
         const { data } = await axios.get(
-          "http://localhost:5000/prisonsphere/dashboard/analytics",
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/prisonsphere/dashboard/analytics`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

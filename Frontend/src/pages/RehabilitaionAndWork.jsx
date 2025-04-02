@@ -38,7 +38,9 @@ const RehabilitationAndWork = () => {
   const fetchWorkProgramSample = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/prisonsphere/work-programs/enrollments/display-sample",
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/work-programs/enrollments/display-sample`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

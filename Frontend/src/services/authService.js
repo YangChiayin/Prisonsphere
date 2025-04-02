@@ -19,7 +19,7 @@
 import axios from "axios";
 
 // **Base API URL for authentication endpoints**
-const API_URL = "http://localhost:5000/prisonsphere/auth";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/auth`;
 
 /**
  * Logs in a user by sending credentials to the authentication API.

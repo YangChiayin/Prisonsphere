@@ -56,7 +56,9 @@ const VisitorDetails = () => {
     const fetchVisitorDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/prisonsphere/visitors/details/${visitorId}`,
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/prisonsphere/visitors/details/${visitorId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -82,7 +84,9 @@ const VisitorDetails = () => {
     const refreshVisitor = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/prisonsphere/visitors/details/${visitorId}`,
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/prisonsphere/visitors/details/${visitorId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

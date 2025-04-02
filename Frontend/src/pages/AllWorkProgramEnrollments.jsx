@@ -35,7 +35,9 @@ const AllWorkProgramEnrollments = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/work-programs/enrollments?page=${currentPage}&limit=${limit}&status=${filter}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/work-programs/enrollments?page=${currentPage}&limit=${limit}&status=${filter}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

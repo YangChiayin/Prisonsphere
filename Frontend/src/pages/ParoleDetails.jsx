@@ -46,7 +46,9 @@ const ParoleDetails = () => {
     const fetchParoleDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/prisonsphere/paroles/${paroleId}`,
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/prisonsphere/paroles/${paroleId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -80,7 +82,7 @@ const ParoleDetails = () => {
     try {
       setProcessing(true);
       await axios.put(
-        `http://localhost:5000/prisonsphere/paroles/${paroleId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/paroles/${paroleId}`,
         { status: newStatus, decisionNotes },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

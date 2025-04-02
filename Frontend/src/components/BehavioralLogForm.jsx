@@ -49,7 +49,7 @@ const BehavioralLogForm = ({ inmateId, workProgramId, onClose }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/prisonsphere/behavior-logs",
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/behavior-logs`,
         {
           inmateId,
           workProgramId,

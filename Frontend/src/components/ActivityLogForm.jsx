@@ -40,7 +40,7 @@ const ActivityLogForm = ({ inmateId, onClose }) => {
 
     try {
       await axios.post(
-        "http://localhost:5000/prisonsphere/activity-logs",
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/activity-logs`,
         {
           inmateId,
           ...formData,

@@ -52,7 +52,9 @@ const ParoleManagement = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/paroles?search=${searchQuery}&status=${statusFilter}&startDate=${startDate}&endDate=${endDate}&page=${page}&limit=${limit}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/paroles?search=${searchQuery}&status=${statusFilter}&startDate=${startDate}&endDate=${endDate}&page=${page}&limit=${limit}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

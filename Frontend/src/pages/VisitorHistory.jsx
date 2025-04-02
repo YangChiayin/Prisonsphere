@@ -60,7 +60,9 @@ const VisitorHistory = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/visitors/${inmateId}?page=${page}&limit=${limit}&startDate=${startDate}&endDate=${endDate}&search=${searchQuery}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/visitors/${inmateId}?page=${page}&limit=${limit}&startDate=${startDate}&endDate=${endDate}&search=${searchQuery}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

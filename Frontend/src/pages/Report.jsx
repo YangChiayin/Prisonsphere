@@ -56,7 +56,9 @@ const Report = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates/report/${selectedInmate._id}/pdf/${type}`,
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates/report/${
+          selectedInmate._id
+        }/pdf/${type}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           responseType: "blob", // Ensures response is treated as a file

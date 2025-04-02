@@ -83,7 +83,7 @@ const ViewInmate = () => {
     try {
       setLoading(true);
       const inmateResponse = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -105,7 +105,9 @@ const ViewInmate = () => {
   const fetchWorkProgram = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/work-programs/enrollments/inmate/${id}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/work-programs/enrollments/inmate/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -135,7 +137,9 @@ const ViewInmate = () => {
   const fetchBehavioralLogs = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/behavior-logs/inmate/${id}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/behavior-logs/inmate/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -158,7 +162,9 @@ const ViewInmate = () => {
   const fetchActivityLogs = async (page = 1) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/activity-logs/inmate/${id}?page=${page}&limit=2`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/activity-logs/inmate/${id}?page=${page}&limit=2`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -186,16 +192,24 @@ const ViewInmate = () => {
     const fetchRelatedData = async () => {
       try {
         const [visitorRes, paroleRes] = await Promise.all([
-          axios.get(`http://localhost:5000/prisonsphere/visitors/${id}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }),
-          axios.get(`http://localhost:5000/prisonsphere/paroles/inmate/${id}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }),
+          axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/visitors/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          ),
+          axios.get(
+            `${
+              import.meta.env.VITE_API_BASE_URL
+            }/prisonsphere/paroles/inmate/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          ),
         ]);
 
         setVisitors(visitorRes.data.visitors || []);

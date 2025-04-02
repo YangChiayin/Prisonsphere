@@ -14,7 +14,7 @@ const InmateSearch = ({ onSelectInmate }) => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:5000/prisonsphere/inmates",
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

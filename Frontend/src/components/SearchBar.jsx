@@ -55,7 +55,9 @@ const SearchBar = ({ setSearchResult, setIsSearching, setSearchQuery }) => {
     try {
       setError("");
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates/search?query=${query}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/inmates/search?query=${query}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

@@ -55,7 +55,7 @@ const InmateManagement = () => {
     const fetchNextID = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/prisonsphere/inmates/next-id",
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates/next-id`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -78,7 +78,9 @@ const InmateManagement = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates?page=${page}&limit=${limit}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/inmates?page=${page}&limit=${limit}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }

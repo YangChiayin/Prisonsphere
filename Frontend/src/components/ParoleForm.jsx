@@ -48,7 +48,7 @@ const ParoleForm = ({ onClose, onFormSuccess }) => {
     const fetchInmates = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/prisonsphere/inmates",
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -112,7 +112,9 @@ const ParoleForm = ({ onClose, onFormSuccess }) => {
 
       // Check inmate's status and pending parole in one request**
       const checkResponse = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates/${selectedInmate._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates/${
+          selectedInmate._id
+        }`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -131,7 +133,9 @@ const ParoleForm = ({ onClose, onFormSuccess }) => {
 
       // Check if the selected inmate has a pending parole**
       const paroleResponse = await axios.get(
-        `http://localhost:5000/prisonsphere/paroles/inmate/${selectedInmate._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/paroles/inmate/${
+          selectedInmate._id
+        }`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -149,7 +153,7 @@ const ParoleForm = ({ onClose, onFormSuccess }) => {
 
       //proceed withs submission
       await axios.post(
-        "http://localhost:5000/prisonsphere/paroles",
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/paroles`,
         {
           inmate: selectedInmate._id, // Send selected inmate ID
           hearingDate,

@@ -135,7 +135,9 @@ const VisitorForm = ({ inmateId, visitorData, onClose, onFormSuccess }) => {
 
       if (isEditMode) {
         response = await axios.put(
-          `http://localhost:5000/prisonsphere/visitors/details/${visitorData._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/visitors/details/${
+            visitorData._id
+          }`,
           data,
           {
             headers: {
@@ -145,7 +147,9 @@ const VisitorForm = ({ inmateId, visitorData, onClose, onFormSuccess }) => {
         );
       } else {
         response = await axios.post(
-          `http://localhost:5000/prisonsphere/visitors/${inmateId}`,
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/prisonsphere/visitors/${inmateId}`,
           data,
           {
             headers: {

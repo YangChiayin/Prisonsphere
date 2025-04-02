@@ -50,7 +50,7 @@ const WorkProgramAssignmentForm = ({ onClose }) => {
   const fetchInmates = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/prisonsphere/inmates",
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -67,7 +67,7 @@ const WorkProgramAssignmentForm = ({ onClose }) => {
   const fetchWorkPrograms = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/prisonsphere/work-programs",
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/work-programs`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -120,7 +120,9 @@ const WorkProgramAssignmentForm = ({ onClose }) => {
     try {
       // Check inmate's status before assigning a work program
       const inmateResponse = await axios.get(
-        `http://localhost:5000/prisonsphere/inmates/${selectedInmate._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/inmates/${
+          selectedInmate._id
+        }`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -138,7 +140,9 @@ const WorkProgramAssignmentForm = ({ onClose }) => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/prisonsphere/work-programs/enrollments",
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/prisonsphere/work-programs/enrollments`,
         {
           inmateId: selectedInmate._id,
           ...formData,

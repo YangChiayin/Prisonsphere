@@ -54,7 +54,7 @@ const TopNavbar = ({ role, title, description }) => {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/prisonsphere/paroles/upcoming",
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/paroles/upcoming`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

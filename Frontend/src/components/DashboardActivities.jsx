@@ -81,7 +81,7 @@ const DashboardActivities = () => {
         }
 
         const { data } = await axios.get(
-          "http://localhost:5000/prisonsphere/recent-activities",
+          `${import.meta.env.VITE_API_BASE_URL}/prisonsphere/recent-activities`,
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,

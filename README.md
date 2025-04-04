@@ -1,4 +1,6 @@
 # PrisonSphere - AI-Driven Prison Management System 🚀
+![image](https://github.com/user-attachments/assets/1dc045de-216c-46d1-906b-f2f6df443549)
+
 
 **PrisonSphere** is an AI-powered **Prison Management System (PMS)** designed to modernize and automate the inmate management process in correctional facilities. This full-stack web application aims to replace outdated, manual systems by introducing **automated reporting, rehabilitation progress tracking, and role-based access control**.
 
